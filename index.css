@@ -1,0 +1,870 @@
+#mirrorLeft{
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    height: 70px;
+}
+#mirrorRight{
+    position: absolute;
+    left: 450px;
+    top: 0px;
+    height: 70px;
+    transform: rotateY(180deg);
+}
+#divReference1{
+    position: absolute;
+    top: 75px;
+    left: 5px;
+    width: 230px;
+    height: 170px;
+    border-width: 50;
+    border-style: solid;
+    border-color: black;
+    background-color:rgb(181, 194, 181);
+}
+#lblRef1{
+    position: absolute;
+    top: -15px;
+    left: 65px;
+    width: 150px;
+    height: 5px;
+    z-index: 1;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 13px;
+}
+#lblNameRef1{
+    position: absolute;
+    top: 12.5px;
+    left: 37.5px;
+    width: 25px;
+    height: 15px;
+    z-index: 1;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 13px;   
+}
+#NameRef1{
+    position: absolute;
+    top: 10px;
+    left: 60px;
+    width: 120px;
+    height: 15px;
+    z-index: 1;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 12px;   
+}
+#selCharge1{
+    position: absolute;
+    top: 10px;
+    left: 187.5px;
+    width: 35px;
+    height: 20px;
+    z-index: 1;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 12px;   
+}
+#lblMass1{
+    position: absolute;
+    top: 37.5px;
+    left: 5px;
+    width: 67.5px;
+    height: 15px;
+    z-index: 1;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 12px;   
+}
+#Mass1{
+    position: absolute;
+    top: 37.5px;
+    left: 60px;
+    width: 160px;
+    height: 15px;
+    z-index: 1;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 13px;   
+}
+#lblToF_Ref1{
+    position: absolute;
+    top: 62.5px;
+    left: 15px;
+    width: 50px;
+    height: 15px;
+    z-index: 1;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 12px;   
+}
+#ToF_Ref1{
+    position: absolute;
+    top: 60px;
+    left: 60px;
+    width: 110px;
+    height: 15px;
+    z-index: 1;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 13px;
+}
+#ToF_Ref1err{
+    position: absolute;
+    top: 60px;
+    left: 178px;
+    width: 40px;
+    height: 15px;
+    z-index: 1;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 13px;
+}
+#lblref1Laps{
+    position: absolute;
+    top: 87.5px;
+    left: 27.5px;
+    width: 50px;
+    height: 5px;
+    z-index: 1;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 13px;
+}
+#ref1Laps{
+    position: absolute;
+    top: 85px;
+    left: 60px;
+    width: 30px;
+    height: 15px;
+    z-index: 1;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 13px;
+}
+#lblRef1EjTime{
+    position: absolute;
+    top: 112.5px;
+    left: 5px;
+    width: 75px;
+    height: 15px;
+    z-index: 1;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 13px;
+    visibility: hidden;
+}
+#Ref1EjTime{
+    position: absolute;
+    top: 110px;
+    left: 60px;
+    width: 110px;
+    height: 15px;
+    z-index: 1;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 13px;
+    visibility: hidden;
+}
+#lblbEstimate{
+    position: absolute;
+    top: 147.5px;
+    left: 5px;
+    width: 120px;
+    height: 20px;
+    z-index: 1;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 13px;
+}
+#bEstimate{
+    position: absolute;
+    top: 143px;
+    left: 120px;
+    width: 100px;
+    height: 20px;
+    z-index: 1;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 13px;
+}
+
+#divReference2{
+    position: absolute;
+    top: 75px;
+    left: 245px;
+    width: 230px;
+    height: 135px;
+    border-width: 50;
+    border-style: solid;
+    border-color: black;
+    background-color:rgb(181, 194, 181);
+}
+#lblRef2{
+    position: absolute;
+    top: -15px;
+    left: 65px;
+    width: 150px;
+    height: 5px;
+    z-index: 1;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 13px;
+}
+#lblNameRef2{
+    position: absolute;
+    top: 12.5px;
+    left: 37.5px;
+    width: 25px;
+    height: 15px;
+    z-index: 1;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 13px;   
+}
+#NameRef2{
+    position: absolute;
+    top: 10px;
+    left: 60px;
+    width: 120px;
+    height: 15px;
+    z-index: 1;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 12px;   
+}
+#selCharge2{
+    position: absolute;
+    top: 10px;
+    left: 187.5px;
+    width: 35px;
+    height: 20px;
+    z-index: 1;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 12px;   
+}
+#lblMass2{
+    position: absolute;
+    top: 37.5px;
+    left: 5px;
+    width: 67.5px;
+    height: 15px;
+    z-index: 1;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 12px;   
+}
+#Mass2{
+    position: absolute;
+    top: 37.5px;
+    left: 60px;
+    width: 160px;
+    height: 15px;
+    z-index: 1;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 13px;   
+}
+#lblToF_Ref2{
+    position: absolute;
+    top: 62.5px;
+    left: 15px;
+    width: 50px;
+    height: 15px;
+    z-index: 1;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 12px;   
+}
+#ToF_Ref2{
+    position: absolute;
+    top: 60px;
+    left: 60px;
+    width: 110px;
+    height: 15px;
+    z-index: 1;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 13px;
+}
+#ToF_Ref2err{
+    position: absolute;
+    top: 60px;
+    left: 178px;
+    width: 40px;
+    height: 15px;
+    z-index: 1;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 13px;
+}
+#lblref2Laps{
+    position: absolute;
+    top: 87.5px;
+    left: 27.5px;
+    width: 50px;
+    height: 5px;
+    z-index: 1;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 13px;
+}
+#ref2Laps{
+    position: absolute;
+    top: 85px;
+    left: 60px;
+    width: 30px;
+    height: 15px;
+    z-index: 1;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 13px;
+}
+#lblRef2EjTime{
+    position: absolute;
+    top: 112.5px;
+    left: 5px;
+    width: 75px;
+    height: 15px;
+    z-index: 1;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 13px;
+}
+#Ref2EjTime{
+    position: absolute;
+    top: 110px;
+    left: 60px;
+    width: 110px;
+    height: 15px;
+    z-index: 1;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 13px;
+}
+
+#divt0Estimated{
+    position: absolute;
+    top: 250px;
+    left: 5px;
+    width: 230px;
+    height: 30px;
+    border-width: 50;
+    border-style: solid;
+    border-color: black;
+    background-color:rgb(244, 199, 247);
+}
+#lblt0{
+    position: absolute;
+    top: 7.5px;
+    left: 5px;
+    width: 120px;
+    height: 20px;
+    z-index: 1;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 13px;
+}
+#t0{
+    position: absolute;
+    top: 2.5px;
+    left: 120px;
+    width: 50px;
+    height: 20px;
+    z-index: 1;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 13px;
+}
+
+#divt0Controls{
+    position: absolute;
+    top: 250px;
+    left: 245px;
+    width: 230px;
+    height: 30px;
+    border-width: 50;
+    border-style: solid;
+    border-color: black;
+    background-color:rgb(204, 163, 207);
+}
+#btn_t0Calc{
+    position: absolute;
+    top: 5px;
+    left: 5px;
+    width: 120px;
+    height: 20px;
+    z-index: 1;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 13px;
+}
+#lblCalct0{
+    position: absolute;
+    top: 7.5px;
+    left: 130px;
+    width: 125px;
+    height: 20px;
+    z-index: 1;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 13px;
+}
+
+#divbControls{
+    position: absolute;
+    top: 215px;
+    left: 245px;
+    width: 230px;
+    height: 30px;
+    border-width: 50;
+    border-style: solid;
+    border-color: black;
+    background-color:rgb(161, 246, 161);
+}
+#btn_bCalc{
+    position: absolute;
+    top: 5px;
+    left: 5px;
+    width: 120px;
+    height: 20px;
+    z-index: 1;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 13px;
+}
+#lblb{
+    position: absolute;
+    top: 7.5px;
+    left: 130px;
+    width: 125px;
+    height: 20px;
+    z-index: 1;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 13px;
+}
+
+#Analyte{
+    position: absolute;
+    top: 75px;
+    left: 485px;
+    width: 230px;
+    height: 135px;
+    border-width: 50;
+    border-style: solid;
+    border-color: black;
+    background-color:rgb(155, 201, 209);
+}
+#lblAnalyte{
+    position: absolute;
+    top: -15px;
+    left: 65px;
+    width: 150px;
+    height: 5px;
+    z-index: 1;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 13px;
+}
+#lblNameAnalyte{
+    position: absolute;
+    top: 12.5px;
+    left: 37.5px;
+    width: 25px;
+    height: 15px;
+    z-index: 1;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 13px;   
+}
+#NameAnalyte{
+    position: absolute;
+    top: 10px;
+    left: 60px;
+    width: 120px;
+    height: 15px;
+    z-index: 1;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 12px;   
+}
+#selChargeAna{
+    position: absolute;
+    top: 10px;
+    left: 187.5px;
+    width: 35px;
+    height: 20px;
+    z-index: 1;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 12px;   
+}
+#lblMassAna{
+    position: absolute;
+    top: 37.5px;
+    left: 5px;
+    width: 67.5px;
+    height: 15px;
+    z-index: 1;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 12px;   
+}
+#MassAna{
+    position: absolute;
+    top: 37.5px;
+    left: 60px;
+    width: 160px;
+    height: 15px;
+    z-index: 1;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 13px;   
+}
+#lblToF_Analyte{
+    position: absolute;
+    top: 62.5px;
+    left: 15px;
+    width: 50px;
+    height: 15px;
+    z-index: 1;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 12px;   
+}
+#ToF_Analyte{
+    position: absolute;
+    top: 60px;
+    left: 60px;
+    width: 110px;
+    height: 15px;
+    z-index: 1;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 13px;
+}
+#ToF_AnalyteErr{
+    position: absolute;
+    top: 60px;
+    left: 178px;
+    width: 40px;
+    height: 15px;
+    z-index: 1;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 13px;
+}
+#lblAnalyteLaps{
+    position: absolute;
+    top: 87.5px;
+    left: 27.5px;
+    width: 50px;
+    height: 5px;
+    z-index: 1;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 13px;
+}
+#AnalyteLaps{
+    position: absolute;
+    top: 85px;
+    left: 60px;
+    width: 30px;
+    height: 15px;
+    z-index: 1;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 13px;
+}
+#lblAnalyteEjTime{
+    position: absolute;
+    top: 112.5px;
+    left: 5px;
+    width: 75px;
+    height: 15px;
+    z-index: 1;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 13px;
+}
+#AnalyteEjTime{
+    position: absolute;
+    top: 110px;
+    left: 60px;
+    width: 110px;
+    height: 15px;
+    z-index: 1;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 13px;
+}
+
+#calcMass{
+    position: absolute;
+    box-sizing: border-box;
+    border: 3px solid;
+/*    border-width: 50; */
+    border-color: black;
+    height: 71px;
+    width: 120px;
+    top: 215px;
+    left: 426px;
+    border-radius: 0px;
+    background-color:rgb(212, 246, 161);
+}
+.tab {
+    border-top-left-radius: 0px;
+    margin-left: 175px;
+}
+
+.tab:before {
+    content:"";
+    display: block;
+    position: relative;
+    height: 30px;
+    width: 116px;
+    right: 119px; /* width + border width */
+    top: -3px;
+    background-color:rgb(212, 246, 161);
+    border: inherit;
+    border-right-width: 0px;
+    border-top-left-radius: 0px;
+    border-bottom-left-radius: 0px;
+}
+#btn_MECalc{
+    position: absolute;
+    top: 5px;
+    left: -110px;
+    width: 100px;
+    height: 20px;
+    z-index: 1;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 12px;
+}
+#lblMassExcess{
+    position: absolute;
+    top: 7.5px;
+    left: 5px;
+    width: 125px;
+    height: 20px;
+    z-index: 1;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 12px;
+}
+#lbldM{
+    position: absolute;
+    top: 27.5px;
+    left: 5px;
+    width: 125px;
+    height: 20px;
+    z-index: 1;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 12px;
+}
+#lblDM{
+    position: absolute;
+    top: 47.5px;
+    left: 5px;
+    width: 125px;
+    height: 20px;
+    z-index: 1;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 12px;
+}
+
+#calcToF{
+    position: absolute;
+    top: 250px;
+    left: 485px;
+    width: 110px;
+    height: 30px;
+    border-width: 50;
+    border-style: solid;
+    border-color: black;
+    background-color:rgb(186, 214, 144);
+}
+#btn_ToFCalc{
+    position: absolute;
+    top: 5px;
+    left: 5px;
+    width: 100px;
+    height: 20px;
+    z-index: 1;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 13px;
+}
+
+#divSCM{
+    position: absolute;
+    top: 300px;
+    left: 5px;
+    width: 710px;
+    height: 190px;
+    border-width: 50;
+    border-style: solid;
+    border-color: black;
+    background-color:rgb(100, 160, 232);
+}
+#lblSCMAnalyte{
+    position: absolute;
+    top: -15.5px;
+    left: 265px;
+    width: 150px;
+    height: 5px;
+    z-index: 1;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 13px;
+}
+#lblToF_SCM{
+    position: absolute;
+    top: 10px;
+    left: 2.5px;
+    width: 110px;
+    height: 15px;
+    z-index: 1;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 13px;
+}
+#ToF_SCM{
+    position: absolute;
+    top: 7.5px;
+    left: 52.5px;
+    width: 110px;
+    height: 15px;
+    z-index: 1;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 13px;
+}
+#ToF_SCMErr{
+    position: absolute;
+    top: 7.5px;
+    left: 171px;
+    width: 40px;
+    height: 15px;
+    z-index: 1;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 13px;
+}
+#lblSCMCharge{
+    position: absolute;
+    top: 30px;
+    left: 2.5px;
+    width: 50px;
+    height: 15px;
+    z-index: 1;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 13px;
+}
+#selChargeSCM{
+    position: absolute;
+    top: 28.5px;
+    left: 52.5px;
+    width: 35px;
+    height: 20px;
+    z-index: 1;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 13px;
+}
+#lblMaxSigma{
+    position: absolute;
+    top: 30px;
+    left: 97.5px;
+    width: 75px;
+    height: 15px;
+    z-index: 1;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 13px;
+}
+#maxSigma{
+    position: absolute;
+    top: 28.5px;
+    left: 171.5px;
+    width: 35px;
+    height: 15px;
+    z-index: 1;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 13px;
+}
+#lblSCMLaps{
+    position: absolute;
+    top: 50px;
+    left: 15.5px;
+    width: 50px;
+    height: 15px;
+    z-index: 1;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 13px;
+}
+#SCMLaps{
+    position: absolute;
+    top: 48.5px;
+    left: 52.5px;
+    width: 50px;
+    height: 15px;
+    z-index: 1;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 13px;
+}
+#lblSCMLapsRange{
+    position: absolute;
+    top: 50px;
+    left: 113.5px;
+    width: 50px;
+    height: 15px;
+    z-index: 1;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 13px;
+}
+#SCMLapsRange{
+    position: absolute;
+    top: 48.5px;
+    left: 123.5px;
+    width: 40px;
+    height: 15px;
+    z-index: 1;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 13px;
+}
+#lblSCMEjTime{
+    position: absolute;
+    top: 72px;
+    left: 2.5px;
+    width: 75px;
+    height: 15px;
+    z-index: 1;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 12px;
+}
+#SCMEjTime{
+    position: absolute;
+    top: 69.5px;
+    left: 52.5px;
+    width: 110px;
+    height: 15px;
+    z-index: 1;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 13px;
+}
+#lblUseStandardList{
+    position: absolute;
+    top: 90.5px;
+    left: 20px;
+    width: 150px;
+    height: 15px;
+    z-index: 1;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 13px;
+}
+#chkUseStandardList{
+    position: absolute;
+    top: 87.5px;
+    left: 0.5px;
+    width: 15px;
+    height: 15px;
+    z-index: 1;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 13px;
+    accent-color: #9b59b6;
+}
+#lblAllowOneRI{
+    position: absolute;
+    top: 111px;
+    left: 20px;
+    width: 150px;
+    height: 15px;
+    z-index: 1;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 13px;
+}
+#chkAllowOneRI{
+    position: absolute;
+    top: 109px;
+    left: 0.5px;
+    width: 15px;
+    height: 15px;
+    z-index: 1;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 13px;
+    accent-color: #9b59b6;
+}
+#isotopeList{
+    position: absolute;
+    top: 131px;
+    left: 5px;
+    width: 250px;
+    height: 50px;
+    z-index: 1;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 12px;
+    resize:none;
+    text-wrap:wrap;
+    overflow:scroll;
+}
+#SCMTable{
+    position: absolute;
+    top: 5px;
+    left: 272.5px;
+    width: 430px;
+    height: 180px;
+    z-index: 1;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 13px;
+    background-color: beige;
+    overflow-y: scroll;
+}

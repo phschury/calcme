@@ -1,0 +1,138 @@
+<!--index.html-->
+<!DOCTYPE html>
+<html lang="en">
+  <link rel="stylesheet" href="index.css">
+  <head>
+    <meta charset="UTF-8">
+    <!-- https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline';"> 
+<!-- <meta http-equiv="content_security_policy": "default-src 'self' style-src 'self' 'unsafe-inline';"> -->
+
+    <title>MRTOF Calculator</title>
+  </head>
+  <body>
+    <img id="logo" src="wnsc_logo.png" alt="HTML5 Icon"> 
+    <img id="mirrorLeft" src="Mirror.png" alt="HTML5 Icon">
+    <img id="mirrorRight" src="Mirror.png" alt="HTML5 Icon">
+
+<div id='divReference1'>
+  <text id="lblRef1">Reference #1</text>
+  <text id="lblNameRef1">Ion</text>
+  <select name="Charge" id="selCharge1">
+    <option value="1">1+</option>
+    <option value="2">2+</option>
+    <option value="3">3+</option>
+  </select>
+  <input id="NameRef1" value="1K39"></input>
+  <text id="lblMass1">Ion Mass:</text>
+  <text id="Mass1">u</text>
+  <text id="lblref1Laps">Laps</text>
+  <input id="ref1Laps" value="690"></input>
+  <text id="lblToF_Ref1">ToF [ns]</text>
+  <input id="ToF_Ref1" value="12437427"></input>
+  <input id="ToF_Ref1err"></input>
+  <text id="lblRef1EjTime">t EjO [ns]</text>
+  <input id="Ref1EjTime"></input>
+  <text id="lblbEstimate">Estimated b-value</text>
+  <input id="bEstimate"></input>
+</div>
+
+<div id='divReference2'>
+  <text id="lblRef2">Reference #2</text>
+  <text id="lblNameRef2">Ion</text>
+  <select name="Charge" id="selCharge2">
+    <option value="1">1+</option>
+    <option value="2">2+</option>
+    <option value="3">3+</option>
+  </select>
+  <input id="NameRef2" value="1K41"></input>
+  <text id="lblMass2">Ion Mass:</text>
+  <text id="Mass2">u</text>
+  <text id="lblref2Laps">Laps</text>
+  <input id="ref2Laps" value="673"></input>
+  <text id="lblToF_Ref2">ToF [ns]</text>
+  <input id="ToF_Ref2" value="12438611"></input>
+  <input id="ToF_Ref2err"></input>
+  <text id="lblRef2EjTime">t EjO [ns]</text>
+  <input id="Ref2EjTime"></input>
+</div>
+
+<div id="divt0Estimated">
+    <text id="lblt0">Estimated t_0 [ns]</text>
+    <input id="t0" value="125"></input>
+</div>
+
+<div id='divt0Controls'>  
+  <text id="lblCalct0">...</text>
+  <button id="btn_t0Calc">Calculate t_0</button>
+</div>
+
+<div id='divbControls'>  
+  <button id="btn_bCalc">Calculate b-value</button>
+  <text id="lblb">...</text>
+</div>
+
+<div id="Analyte">
+    <text id="lblAnalyte">Known Analyte</text>
+  <text id="lblNameAnalyte">Ion</text>
+  <select name="Charge" id="selChargeAna">
+    <option value="1">1+</option>
+    <option value="2">2+</option>
+    <option value="3">3+</option>
+  </select>
+  <input id="NameAnalyte" value=""></input>
+  <text id="lblMassAna">Ion Mass:</text>
+  <text id="MassAna">u</text>
+  <text id="lblAnalyteLaps">Laps</text>
+  <input id="AnalyteLaps" value=""></input>
+  <text id="lblToF_Analyte">ToF [ns]</text>
+  <input id="ToF_Analyte" value=""></input>
+  <input id="ToF_AnalyteErr"></input>
+  <text id="lblAnalyteEjTime">t EjO [ns]</text>
+  <input id="AnalyteEjTime"></input>
+</div>
+
+<div id="calcMass" class="tab">
+  <button id="btn_MECalc">Calculate Mass</button>
+  <text id="lblMassExcess">ME= ... keV</text>
+  <text id="lbldM">δME= ... keV</text>
+  <text id="lblDM">Δm= ... keV</text>
+</div>
+
+<div id="calcToF">
+  <button id="btn_ToFCalc">Calculate ToF</button>
+</div>
+
+<div id="divSCM">
+  <text id="lblSCMAnalyte">Unknown Analyte (SCM)</text>
+  <text id="lblSCMLaps">Laps:</text>
+  <text id="lblSCMLapsRange">±</text>
+  <text id="lblSCMCharge">Charge:</text>
+  <select name="Charge" id="selChargeSCM">
+    <option value="1">1+</option>
+    <option value="2">2+</option>
+    <option value="3">3+</option>
+  </select>
+  <text id="lblMaxSigma">Max Sigma:</text>
+  <input id="maxSigma" value="5"></input>
+  <input id="SCMLaps" value=""></input>
+  <input id="SCMLapsRange" value="20"></input>
+  <text id="lblToF_SCM">ToF [ns]</text>
+  <input id="ToF_SCM" value=""></input>
+  <input id="ToF_SCMErr"></input>
+  <text id="lblSCMEjTime">t EjO [ns]</text>
+  <input id="SCMEjTime"></input>
+  <text id="lblUseStandardList">Use Standard Isotope Set</text>
+  <input id="chkUseStandardList" type="checkbox" checked></input>
+  <text id="lblAllowOneRI">Include 1 RI in search</text>
+  <input id="chkAllowOneRI" type="checkbox"></input>
+  <textarea id="isotopeList">H1;C12;C13;N14;N15;O16;O17;O18;F19;Ne20;Ne22;S32;S33;S34;Cl35;Cl37;Ar36;Ar38;Ar40;Se74;Se76;Se77;Se78;Se80;Br79;Br81</textarea>
+  <table id="SCMTable"></table>
+</div>
+
+<script src="./render.js">
+
+</script>
+
+  </body>
+</html>
