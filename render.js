@@ -4,6 +4,7 @@ var NUBASE = new Array();
 var t0withErr = {val: 125, err: 0};
 var bwithErr = {val: 0, err: 0};
 NUBASE = loadNUBASE();
+var periodicData = getChart(document.getElementById("divPeriodicTable"));
 
 var logoIMG = document.getElementById("logo");
 logoIMG.addEventListener("click", function(){alert("Nice aim!")}, false);
@@ -26,16 +27,29 @@ btn_t0Calc = document.getElementById("btn_t0Calc");
   btn_t0Calc.addEventListener("click", maket0Calc, false);
 
 btn_CalcToF = document.getElementById("btn_ToFCalc");
-btn_CalcToF.addEventListener("click", calcToF, false);
+  btn_CalcToF.addEventListener("click", calcToF, false);
 
 btn_CalcMass = document.getElementById("btn_MECalc");
-btn_CalcMass.addEventListener("click", calcMass, false);
+  btn_CalcMass.addEventListener("click", calcMass, false);
+
+btnSelectNone = document.getElementById("btnSelectNone");
+  btnSelectNone.addEventListener("click", fnSelectNone, false);
+
+btnStandardSelection = document.getElementById("btnSelectStandardSet");
+  btnStandardSelection.addEventListener("click", fnStandardSelection, false);
+
+btnFindSCM = document.getElementById("btnFindSCM");
+  btnFindSCM.addEventListener("click", fnFindSCM, false);
 
 window.electronAPI.onMenuClearT0((value) => {
     t0withErr = {val: 125, err: 0};
     document.getElementById("lblCalct0").innerHTML = "...";
     document.getElementById("t0").value = 125;
+    console.log(periodicData);
+    console.log(periodicData.length);
   })
+
+
 //----------------------------------------------------    
 
 function makebCalc() {
@@ -408,7 +422,7 @@ function getMass(thisNuclide, charge){
   var theMass = 0;
   for(let i=0; i<theAtoms.length; i++){
     var theJSON = NUBASE.find(({nuclide}) => nuclide === theAtoms.at(i).nuclide);
-    console.log(theJSON);
+//    console.log(theJSON);
     var n= parseFloat(theAtoms.at(i).theNumber);
     theMass += n*theJSON.A*ukeV + theJSON.MassExcess;
   }
@@ -532,13 +546,18 @@ function finalParse(theJSON){
     theJSON.halflifeSeconds = 1e14;
     var endVal = 0;
     for(let i=0; i<theJSON.BR.length; i++) if(theJSON.BR.at(i) == ' ') endVal = i;
-    theJSON.abundance = theJSON.BR.slice(3, endVal);
+    theJSON.abundance = parseFloat(theJSON.BR.slice(3, endVal));
   }
   else{
 //      console.log(theJSON.Halflife);
     theJSON.Halflife = parseFloat(theJSON.Halflife);
     if(isNaN(theJSON.Halflife)) theJSON.Halflife = 0;
-    theJSON.abundance = 0;
+    if(theJSON.BR.slice(0,2) == "IS"){ 
+      var endVal = 0;
+      for(let i=0; i<theJSON.BR.length; i++) if(theJSON.BR.at(i) == ' ') endVal = i;
+      theJSON.abundance = parseFloat(theJSON.BR.slice(3, endVal));
+    }
+    else theJSON.abundance = 0;
   }
 
   //Remove white space from half-life, convert to float
@@ -561,6 +580,9 @@ function finalParse(theJSON){
 
   //Set halflife in seconds
   switch(theJSON.t12unit){
+    case "Py":
+      theJSON.halflifeSeconds = 1e12*365*24*3600*theJSON.Halflife;
+      break;
     case "Gy":
       theJSON.halflifeSeconds = 1e9*365*24*3600*theJSON.Halflife;
       break;
@@ -666,13 +688,383 @@ function loadNUBASE(){
 
           thisLineAsJSON = finalParse(thisLineAsJSON);
 
-//            if(thisLineAsJSON.element[0] == "C") console.log(thisLineAsJSON.A);
+//          if(thisLineAsJSON.element[0] == "V") console.log(thisLineAsJSON);
           theNUBASE.push(thisLineAsJSON);
         }         
       }
     })
     .catch((e) => console.error(e));
+//    getChart();
   return theNUBASE;
 }
 
 //----------------------------------------------------  
+
+function getChart(mydiv){
+  var symbols = new Array();
+
+  async function getSymbols(){
+    return fetch("periodic.data")
+        .then((res) => res.text())
+        .then((text) => {
+          var theWholeTable = new Array();
+          theWholeTable = text.split(/\r\n|\n/);       
+          console.log("The periodic table has %i entries", theWholeTable.length);
+          for(let i=0; i<theWholeTable.length; i++){
+              var thisData = new Array();
+              thisData = theWholeTable.at(i).split(' ');
+              var thisJSON = {Symbol: "", row: "", column: "", selected: "N"};
+              if(thisData.length = 3){
+
+                thisJSON.Symbol = thisData.at(0);
+                thisJSON.row = parseFloat(thisData.at(1));
+                thisJSON.column = parseFloat(thisData.at(2));
+                  symbols.push(thisJSON);
+//                  console.log(symbols.at(i));
+              }
+              else console.log(thisData.length);
+          }
+        })
+        .catch((e) => console.error(e));
+  }
+
+  async function doIt(){
+    await getSymbols();
+//    console.log(symbols);
+//    console.log(symbols.length);
+    for(let i=0; i<symbols.length;i++){
+      var btnThisElement = document.createElement("button");
+      btnThisElement.index = i;
+      btnThisElement.id = "btnElement"+i;
+      btnThisElement.type = "text";
+      btnThisElement.style.position = 'absolute';
+      btnThisElement.style.backgroundColor = "yellow";
+      btnThisElement.style.left = 1.5+27*symbols.at(i).column + "px";
+      btnThisElement.style.top = 1.5+15*symbols.at(i).row + "px";
+      btnThisElement.style.width = '27px';
+      btnThisElement.style.font = "10px Arial";
+      btnThisElement.addEventListener("click", 
+        function(){
+          if(this.style.backgroundColor === "green"){ 
+            this.style.backgroundColor = "yellow";
+            symbols.at(parseInt(this.index)).selected = "N";
+          }
+          else{
+             this.style.backgroundColor = "green";
+             symbols.at(parseInt(this.index)).selected = "Y";
+          }
+        }, false);
+        btnThisElement.innerHTML = symbols.at(i).Symbol;
+      mydiv.appendChild(btnThisElement);
+    }
+  }
+
+  doIt();
+
+  return symbols;
+}
+
+function getElementIndex(theElement){
+  for(let i=0; i<periodicData.length;i++){
+    if(periodicData.at(i).Symbol == theElement) return i;
+  }
+  return -1;
+}
+
+function fnSelectNone(){
+  for(let i=0; i<periodicData.length;i++){
+    var thisButton = document.getElementById("btnElement"+i);
+    thisButton.style.backgroundColor = "yellow";
+    thisButton.selected = "N";
+    periodicData.at(i).selected = "N";
+  }
+  console.log("Nothing?");
+}
+
+function fnStandardSelection(){
+  var standardArray = ["H", "C", "N", "O", "F", "S", "Ar"];
+  fnSelectNone();
+  for(let i=0; i<standardArray.length; i++){
+    var thisIndex = getElementIndex(standardArray.at(i));
+    var thisButton = document.getElementById("btnElement"+thisIndex);
+    thisButton.style.backgroundColor = "green";
+    thisButton.selected = "Y";
+    periodicData.at(thisIndex).selected = "Y";
+  }
+
+  getListOfSelectedIsotopes();
+}
+
+function getListOfSelectedElements(){
+  var selectedElements = new Array();
+  for(let i=0; i<periodicData.length;i++){
+    if(periodicData.at(i).selected === "Y"){ 
+//      console.log(periodicData.at(i).Symbol);
+      selectedElements.push(periodicData.at(i).Symbol);
+    }
+  }
+
+  return selectedElements;
+}
+
+function getListOfSelectedIsotopes(){
+  var theSelectedIsotopes = new Array();
+  var theSelectedElements = getListOfSelectedElements();
+  var minAbundance = parseFloat(document.getElementById("minAbundance").value);
+  var maxRIs = parseFloat(document.getElementById("selMaxRI").value);
+  var minHalflife = parseFloat(document.getElementById("minHalflife").value);
+  console.log(minAbundance);
+  console.log(maxRIs);
+  console.log(minHalflife);
+  for(let i=0; i<theSelectedElements.length; i++){
+    var thisElement = theSelectedElements.at(i);
+//    console.log(thisElement);
+    for(let j=0; j<NUBASE.length; j++){
+      if(thisElement == NUBASE.at(j).element){ 
+        if(parseFloat(NUBASE.at(j).abundance) > minAbundance){
+//          console.log(NUBASE.at(j).nuclide);
+          theSelectedIsotopes.push(NUBASE.at(j).nuclide);
+        }
+        if(maxRIs > 0) if(parseFloat(NUBASE.at(j).abundance) == 0){
+          if(NUBASE.at(j).halflifeSeconds > minHalflife){
+//            console.log("%s, %d s", NUBASE.at(j).nuclide, NUBASE.at(j).halflifeSeconds);
+            theSelectedIsotopes.push(NUBASE.at(j).nuclide);
+          } 
+        }
+      }
+    }
+  }
+  return theSelectedIsotopes;
+}
+
+function fnFindSCM() {
+  async function showProcessing() {
+      return new Promise(resolve => {
+          document.getElementById("btnFindSCM").innerHTML = "Processing...";
+          resolve();
+      });
+  }
+
+  showProcessing()
+      .then(() => {
+          // Allow UI to update before calling the next function
+          return new Promise(resolve => setTimeout(resolve, 10));
+      })
+      .then(() => reallyFindSCM())
+      .catch(error => console.log(error));
+}
+/*
+function fnFindSCM(){
+
+  async function showProcessing() {
+    document.getElementById("btnFindSCM").innerHTML = "Processing...";   
+  }
+
+  async function awaitShowProcessing(){
+    await showProcessing();
+
+  }
+
+  awaitShowProcessing();
+
+  reallyFindSCM();
+}
+*/
+
+async function reallyFindSCM(){
+
+  var tbl = document.getElementById("SCMTable");
+  tbl.innerHTML = "";
+  tbl.style.maxHeight = "180px";
+  tbl.style.overflow = "auto";
+  tbl.style.display = "block";
+  const tblBody = document.createElement("tbody");
+  tblBody.style.maxHeight = "180px";
+  tblBody.style.overflow = "auto";
+  tblBody.style.display = "block";
+  const headerRow = document.createElement("tr");
+  if(1){
+    const cellMoleculeName = document.createElement("td");
+    const cellTextMoleculeName = document.createTextNode("Molecule");
+    cellMoleculeName.appendChild(cellTextMoleculeName);
+    headerRow.appendChild(cellMoleculeName);
+    const cellMoleculeDevSigma = document.createElement("td");
+    const cellTextMoleculeDevSigma = document.createTextNode("σ");
+    cellMoleculeDevSigma.appendChild(cellTextMoleculeDevSigma);
+    headerRow.appendChild(cellMoleculeDevSigma);
+    const cellMoleculeDevKeV = document.createElement("td");
+    const cellTextMoleculeDevKeV = document.createTextNode("Δm [keV/c^2]");
+    cellMoleculeDevKeV.appendChild(cellTextMoleculeDevKeV);
+    headerRow.appendChild(cellMoleculeDevKeV);
+    tblBody.appendChild(headerRow);
+    tbl.appendChild(tblBody);
+    tbl.setAttribute("border", "1");
+  }
+
+  var maxElements = parseInt(document.getElementById("selMaxElements").value);
+  var maxAtoms = parseInt(document.getElementById("selMaxAtoms").value);
+
+  var theNuclide1 = document.getElementById("NameRef1");
+  var theCharge1 = parseFloat(document.getElementById("selCharge1").value);
+  var theMass1 = getMass(theNuclide1.value, theCharge1);
+  document.getElementById("Mass1").innerHTML = String(theMass1).concat("", " u");
+
+  var t_ref = parseFloat(document.getElementById("ToF_Ref1").value);
+  var dt_ref = parseFloat(document.getElementById("ToF_Ref1err").value);
+  if(document.getElementById("ToF_Ref1err").value == "") dt_ref = 0;
+  console.log("dt_ref is %f", dt_ref);
+  var m_ref = parseFloat(document.getElementById("Mass1").innerHTML);
+  var q_ref = parseFloat(document.getElementById("selCharge1").value);
+  var m_lap = parseFloat(document.getElementById("ref1Laps").value);
+
+  var t_SCM = parseFloat(document.getElementById("ToF_SCM").value);
+  var dt_SCM = parseFloat(document.getElementById("ToF_SCMErr").value);
+  if(document.getElementById("ToF_SCMErr").value == "") dt_SCM = 0;
+  var q_SCM = parseFloat(document.getElementById("selChargeSCM").value);
+  console.log("q_SCM is %f", q_SCM);
+
+  console.log("q_SCM is %f", q_SCM);
+  console.log("m_ref is %f", m_ref);
+  console.log("q_ref is %f", q_ref);
+  console.log("t_SCM is %f", t_SCM);
+  console.log("t0withErr is %f", t0withErr.val);
+  console.log("t_ref is %f", t_ref);
+
+  var m_SCM = q_SCM*(m_ref/q_ref)*(t_SCM - t0withErr.val)*(t_SCM - t0withErr.val)/((t_ref - t0withErr.val)*(t_ref - t0withErr.val));
+  var dm_SCM = Math.sqrt((dt_ref*dt_ref)/(t_ref*t_ref) + (dt_SCM*dt_SCM)/(t_SCM*t_SCM))*m_SCM;
+
+  //calculate mass at lap number
+  console.log("t_0 is %f", t0withErr.val);
+  console.log("m_SCM is %f", m_SCM);
+  console.log("dm_SCM is %f", dm_SCM);
+
+  var theSelectedIsotopes = getListOfSelectedIsotopes();
+  if(theSelectedIsotopes.length == 0) alert("No isotopes to choose from!");
+  else{  //Look for match
+    var theCandidate = "";
+    var theWinnersList = new Array();
+    if(maxElements == 1) for(let i=0; i<theSelectedIsotopes.length; i++) for(let n=0; n<=maxAtoms; n++){
+      theCandidate = String(n).concat("", theSelectedIsotopes.at(i));
+//      console.log(theCandidate);
+      var test_mass = getMass(theCandidate, q_SCM); //theSelectedIsotopes.at(i)
+      var m_dif = Math.abs(m_SCM - test_mass);
+      if(m_dif < 0.5/q_SCM){
+        var sigma = m_dif/dm_SCM;
+        console.log("test_nuclide is %s", theCandidate);//theSelectedIsotopes.at(i));
+        console.log("test_mass is %f", test_mass);
+        console.log("the difference is %f sigma", sigma);
+        tblBody.style.maxHeight = "180px";
+        tblBody.style.height = "180px";
+        tblBody.style.overflow = "auto";
+        const row = document.createElement("tr");
+        const cellMoleculeName = document.createElement("td");
+        const cellTextMoleculeName = document.createTextNode(theCandidate);
+        cellMoleculeName.appendChild(cellTextMoleculeName);
+        row.appendChild(cellMoleculeName);
+        const cellMoleculeDevSigma = document.createElement("td");
+        const cellTextMoleculeDevSigma = document.createTextNode(sigma);
+        cellMoleculeDevSigma.appendChild(cellTextMoleculeDevSigma);
+        row.appendChild(cellMoleculeDevSigma);
+        const cellMoleculeDevKeV = document.createElement("td");
+        const cellTextMoleculeDevKeV = document.createTextNode(m_dif*ukeV);
+        cellMoleculeDevKeV.appendChild(cellTextMoleculeDevKeV);
+        row.appendChild(cellMoleculeDevKeV);
+        tblBody.appendChild(row);
+        tbl.appendChild(tblBody);
+      }
+    }
+    if(maxElements == 2) for(let i=0; i<theSelectedIsotopes.length; i++) for(let n=0; n<=maxAtoms; n++){
+      var theCandidatePart1 = "";
+      if(n != 0) theCandidatePart1 = String(n).concat("", theSelectedIsotopes.at(i));
+      for(let i2=i+1; i2<theSelectedIsotopes.length; i2++) for(let n2=0; n2<=maxAtoms; n2++){
+        var theCandidatePart2 = "";
+        if(n2 != 0) theCandidatePart2 = String(n2).concat("", theSelectedIsotopes.at(i2));
+        if(n == 0) theCandidate = theCandidatePart2;
+        else if(n2 == 0) theCandidate = theCandidatePart1;
+        else theCandidate = theCandidatePart1.concat(";", theCandidatePart2);
+        if(theCandidate != ""){
+          var test_mass = getMass(theCandidate, q_SCM); //theSelectedIsotopes.at(i)
+          var m_dif = Math.abs(m_SCM - test_mass);
+          if(m_dif < 0.5/q_SCM){
+            var sigma = m_dif/dm_SCM;
+            var alreadyListed = 0;
+            for(let winnerIndex=0; winnerIndex<theWinnersList.length; winnerIndex++) 
+              if(theWinnersList.at(winnerIndex) == theCandidate) alreadyListed = 1;
+            if(alreadyListed == 0){ 
+              theWinnersList.push(theCandidate);
+              console.log("test_nuclide is %s", theCandidate);//theSelectedIsotopes.at(i));
+              console.log("test_mass is %f", test_mass);
+              console.log("the difference is %f sigma", sigma);
+
+              var sigma = m_dif/dm_SCM;
+              console.log("test_nuclide is %s", theCandidate);//theSelectedIsotopes.at(i));
+              console.log("test_mass is %f", test_mass);
+              console.log("the difference is %f sigma", sigma);
+              tblBody.style.maxHeight = "180px";
+              tblBody.style.height = "180px";
+              tblBody.style.overflow = "scroll";
+              tblBody.style.overflowY = "scroll";
+              const row = document.createElement("tr");
+              const cellMoleculeName = document.createElement("td");
+              const cellTextMoleculeName = document.createTextNode(theCandidate);
+              cellMoleculeName.appendChild(cellTextMoleculeName);
+              row.appendChild(cellMoleculeName);
+              const cellMoleculeDevSigma = document.createElement("td");
+              const cellTextMoleculeDevSigma = document.createTextNode(sigma);
+              cellMoleculeDevSigma.appendChild(cellTextMoleculeDevSigma);
+              row.appendChild(cellMoleculeDevSigma);
+              const cellMoleculeDevKeV = document.createElement("td");
+              const cellTextMoleculeDevKeV = document.createTextNode(m_dif*ukeV);
+              cellMoleculeDevKeV.appendChild(cellTextMoleculeDevKeV);
+              row.appendChild(cellMoleculeDevKeV);
+              tblBody.appendChild(row);
+              tbl.appendChild(tblBody);
+              console.log(tblBody.style.height);
+            }
+          }
+        }
+      }
+    }
+    if(maxElements == 3) for(let i=0; i<theSelectedIsotopes.length; i++) for(let n=0; n<=maxAtoms; n++){
+      var theCandidatePart1 = "";
+      if(n != 0) theCandidatePart1 = String(n).concat("", theSelectedIsotopes.at(i));
+      for(let i2=i+1; i2<theSelectedIsotopes.length; i2++) for(let n2=0; n2<=maxAtoms; n2++){
+        var theCandidatePart2 = "";
+        if(n2 != 0) theCandidatePart2 = String(n2).concat("", theSelectedIsotopes.at(i2));
+        for(let i3=i2+1; i3<theSelectedIsotopes.length; i3++) for(let n3=0; n3<=maxAtoms; n3++){
+          var theCandidatePart3 = "";
+          if(n3 != 0) theCandidatePart3 = String(n3).concat("", theSelectedIsotopes.at(i3));
+          if(n == 0){
+            if(n3 == 0) theCandidate = theCandidatePart2;
+            else if(n2 == 0) theCandidate = theCandidatePart3;
+            else theCandidate = theCandidatePart2.concat(";", theCandidatePart3);
+          }
+          else if(n2 == 0){
+            if(n3 == 0) theCandidate = theCandidatePart1;
+            else theCandidate = theCandidatePart1.concat(";", theCandidatePart3);
+          }
+          else theCandidate = theCandidatePart1.concat(";", theCandidatePart2.concat(";", theCandidatePart3));
+          if(theCandidate != ""){
+            var test_mass = getMass(theCandidate, q_SCM); //theSelectedIsotopes.at(i)
+            var m_dif = Math.abs(m_SCM - test_mass);
+            if(m_dif < 0.5/q_SCM){
+              var sigma = m_dif/dm_SCM;
+              var alreadyListed = 0;
+              for(let winnerIndex=0; winnerIndex<theWinnersList.length; winnerIndex++) 
+                if(theWinnersList.at(winnerIndex) == theCandidate) alreadyListed = 1;
+              if(alreadyListed == 0){ 
+                theWinnersList.push(theCandidate);
+                console.log("test_nuclide is %s", theCandidate);//theSelectedIsotopes.at(i));
+                console.log("test_mass is %f", test_mass);
+                console.log("the difference is %f sigma", sigma);
+              }
+            }
+          }
+        }
+      }
+    }
+
+  }
+  document.getElementById("btnFindSCM").innerHTML = "Find Them!";   
+//  document.getElementById("lblSearching").text = "...";
+}

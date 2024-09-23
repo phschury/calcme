@@ -119,20 +119,59 @@
   <input id="SCMLapsRange" value="20"></input>
   <text id="lblToF_SCM">ToF [ns]</text>
   <input id="ToF_SCM" value=""></input>
-  <input id="ToF_SCMErr"></input>
+  <input id="ToF_SCMErr" value=""></input>
   <text id="lblSCMEjTime">t EjO [ns]</text>
   <input id="SCMEjTime"></input>
-  <text id="lblUseStandardList">Use Standard Isotope Set</text>
-  <input id="chkUseStandardList" type="checkbox" checked></input>
-  <text id="lblAllowOneRI">Include 1 RI in search</text>
-  <input id="chkAllowOneRI" type="checkbox"></input>
-  <textarea id="isotopeList">H1;C12;C13;N14;N15;O16;O17;O18;F19;Ne20;Ne22;S32;S33;S34;Cl35;Cl37;Ar36;Ar38;Ar40;Se74;Se76;Se77;Se78;Se80;Br79;Br81</textarea>
+  <button id="btnFindSCM">Find Them!</button>
+  <text id="lblSearching">...</text>
   <table id="SCMTable"></table>
 </div>
 
-<script src="./render.js">
+<div id="divPeriodicTable">
+  <text id="lblMinAbundance">Min. Abundance [%]:</text>
+  <input id="minAbundance" value="1"></input>
+  <text id="lblMaxElements">Max Elements:</text>
+  <select name="MaxElements" id="selMaxElements">
+    <option value="1">1</option>
+    <option value="2">2</option>
+    <option value="3">3</option>
+    <option value="4">4</option>
+    <option value="5">5</option>
+    <option value="6">6</option>
+  </select>
+  <text id="lblMaxAtoms">Max Atoms:</text>
+  <select name="MaxAtoms" id="selMaxAtoms">
+    <option value="1">1</option>
+    <option value="2">2</option>
+    <option value="3">3</option>
+    <option value="4">4</option>
+    <option value="5">5</option>
+    <option value="6">6</option>
+    <option value="7">7</option>
+    <option value="8">8</option>
+    <option value="9">9</option>
+    <option value="10">10</option>
+    <option value="11">11</option>
+    <option value="12">12</option>
+    <option value="13">13</option>
+    <option value="14">14</option>
+    <option value="15">15</option>
+  </select>
+  <text id="lblMaxRI">Max RI Atoms:</text>
+  <select name="MaxRI" id="selMaxRI">
+    <option value="0">0</option>
+    <option value="1">1</option>
+    <option value="2">2</option>
+  </select>
+  <text id="lblMinHalflife">Min. Halflife [s]:</text>
+  <input id="minHalflife" value="0.1"></input>
 
-</script>
+  <button id="btnSelectStandardSet">Standard Selection</button>
+  <button id="btnSelectNone">Deselect All</button>
+</div>
+
+<!-- <script src="./periodic.js"> </script> -->
+<script src="./render.js"> </script>
 
   </body>
 </html>

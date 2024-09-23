@@ -652,7 +652,7 @@
 
 #divSCM{
     position: absolute;
-    top: 300px;
+    top: 302px;
     left: 5px;
     width: 710px;
     height: 190px;
@@ -663,7 +663,7 @@
 }
 #lblSCMAnalyte{
     position: absolute;
-    top: -15.5px;
+    top: -17.5px;
     left: 265px;
     width: 150px;
     height: 5px;
@@ -801,70 +801,167 @@
     font-family: Arial, Helvetica, sans-serif;
     font-size: 13px;
 }
-#lblUseStandardList{
+#btnFindSCM{
     position: absolute;
-    top: 90.5px;
-    left: 20px;
+    top: 110.5px;
+    left: 50px;
     width: 150px;
-    height: 15px;
+    height: 25px;
     z-index: 1;
     font-family: Arial, Helvetica, sans-serif;
     font-size: 13px;
 }
-#chkUseStandardList{
+#lblSearching{
     position: absolute;
-    top: 87.5px;
-    left: 0.5px;
-    width: 15px;
-    height: 15px;
-    z-index: 1;
-    font-family: Arial, Helvetica, sans-serif;
-    font-size: 13px;
-    accent-color: #9b59b6;
-}
-#lblAllowOneRI{
-    position: absolute;
-    top: 111px;
-    left: 20px;
+    top: 140.5px;
+    left: 50px;
     width: 150px;
-    height: 15px;
+    height: 25px;
     z-index: 1;
     font-family: Arial, Helvetica, sans-serif;
     font-size: 13px;
-}
-#chkAllowOneRI{
-    position: absolute;
-    top: 109px;
-    left: 0.5px;
-    width: 15px;
-    height: 15px;
-    z-index: 1;
-    font-family: Arial, Helvetica, sans-serif;
-    font-size: 13px;
-    accent-color: #9b59b6;
-}
-#isotopeList{
-    position: absolute;
-    top: 131px;
-    left: 5px;
-    width: 250px;
-    height: 50px;
-    z-index: 1;
-    font-family: Arial, Helvetica, sans-serif;
-    font-size: 12px;
-    resize:none;
-    text-wrap:wrap;
-    overflow:scroll;
 }
 #SCMTable{
     position: absolute;
     top: 5px;
-    left: 272.5px;
-    width: 430px;
-    height: 180px;
+    left: 252.5px;
+    width: 450px;
     z-index: 1;
     font-family: Arial, Helvetica, sans-serif;
     font-size: 13px;
     background-color: beige;
-    overflow-y: scroll;
+    max-height: 180px;
+    overflow: scroll;
+}
+
+#divPeriodicTable{
+    position: absolute;
+    top: 500px;
+    left: 5px;
+    width: 710px;
+    height: 190px;
+    border-width: 50;
+    border-style: solid;
+    border-color: black;
+    background-color:rgb(100, 160, 232);
+}
+#lblMinAbundance{
+    position: absolute;
+    top: 21px;
+    left: 520px;
+    width: 120px;
+    height: 15px;
+    z-index: 1;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 13px;
+}
+#minAbundance{
+    position: absolute;
+    top: 19px;
+    left: 645px;
+    width: 50px;
+    height: 15px;
+    z-index: 1;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 13px;
+}
+#lblMaxElements{
+    position: absolute;
+    top: 41px;
+    left: 520px;
+    width: 120px;
+    height: 15px;
+    z-index: 1;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 13px;
+}
+#selMaxElements{
+    position: absolute;
+    top: 39px;
+    left: 645px;
+    width: 57.5px;
+    height: 20px;
+    z-index: 1;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 13px;
+}
+#lblMaxAtoms{
+    position: absolute;
+    top: 61px;
+    left: 520px;
+    width: 120px;
+    height: 15px;
+    z-index: 1;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 13px;
+}
+#selMaxAtoms{
+    position: absolute;
+    top: 59px;
+    left: 645px;
+    width: 57.5px;
+    height: 20px;
+    z-index: 1;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 13px;
+}
+#lblMaxRI{
+    position: absolute;
+    top: 81px;
+    left: 520px;
+    width: 120px;
+    height: 15px;
+    z-index: 1;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 13px;
+}
+#selMaxRI{
+    position: absolute;
+    top: 79px;
+    left: 645px;
+    width: 57.5px;
+    height: 20px;
+    z-index: 1;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 13px;
+}
+#lblMinHalflife{
+    position: absolute;
+    top: 101px;
+    left: 520px;
+    width: 120px;
+    height: 15px;
+    z-index: 1;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 13px;
+}
+#minHalflife{
+    position: absolute;
+    top: 99px;
+    left: 645px;
+    width: 50px;
+    height: 15px;
+    z-index: 1;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 13px;
+}
+#btnSelectStandardSet{
+    position: absolute;
+    top: 21px;
+    left: 90px;
+    width: 130px;
+    height: 20px;
+    z-index: 1;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 13px;
+}
+#btnSelectNone{
+    position: absolute;
+    top: 21px;
+    left: 240px;
+    width: 90px;
+    height: 20px;
+    z-index: 1;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 13px;
 }
