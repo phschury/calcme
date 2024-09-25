@@ -8,8 +8,9 @@ const path = require('node:path')
 const createWindow = () => {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
-    width: 1740,
-    height: 900,
+    width: 735,
+    height: 730,
+    resizable: false,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js')
     }
@@ -81,7 +82,7 @@ const createWindow = () => {
       submenu: [
         { label: 'Restore Defaluts', role: 'reload' },
   //      { role: 'forceReload' },
-        { role: 'toggleDevTools' },
+//        { role: 'toggleDevTools' },
         { type: 'separator' },
         { role: 'resetZoom' },
         { role: 'zoomIn' },
@@ -131,7 +132,7 @@ const createWindow = () => {
   mainWindow.loadFile('index.html')
 
   // Open the DevTools.
-  mainWindow.webContents.openDevTools()
+//  mainWindow.webContents.openDevTools()
 }
 
 // This method will be called when Electron has finished

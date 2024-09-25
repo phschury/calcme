@@ -83,7 +83,7 @@ if(document.getElementById("ref1Laps").value == ""){
 }
 if(ok){
   if(document.getElementById("ref2Laps").value == ""){
-    console.log("Looking for laps of reference 2");
+//    console.log("Looking for laps of reference 2");
     if(document.getElementById("bEstimate").value == ""){
       alert("Give us even a rough estimate of the b-value for reference 1");
       ok = false;
@@ -120,11 +120,11 @@ if(ok){
   var ToFRef1Err = parseFloat(document.getElementById("ToF_Ref1err").value);
   var ToFRef2 = parseFloat(document.getElementById("ToF_Ref2").value) - t0;
   var ToFRef2Err = parseFloat(document.getElementById("ToF_Ref2err").value);
-
+/*
   console.log("The tof for Ref1 is ", ToFRef1);
   console.log("The tof for Ref2 is ", ToFRef2*Math.sqrt(mOverQ1/mOverQ2));
   console.log("The tof difference is ", ToFRef2*Math.sqrt(mOverQ1/mOverQ2) - ToFRef1);
-
+*/
   var bvalue = (ToFRef2*Math.sqrt(mOverQ1/mOverQ2) - ToFRef1)/(ref2Laps - ref1Laps);
   var theLabel = document.getElementById("lblb");
   var DeltaToFErr = Math.sqrt(ToFRef2Err*ToFRef2Err*(mOverQ1/mOverQ2) + ToFRef1Err*ToFRef1Err)/DeltaN;
@@ -167,10 +167,11 @@ function maket0Calc() {
         var massRatio = Math.sqrt(mOverQ1/mOverQ2);
 
         var t0value = (massRatio*ToFRef2-ToFRef1)/(massRatio-1);
+/*
         console.log("The tof for Ref1 is ", ToFRef1);
         console.log("The tof for 41 is ", ToFRef2);
         console.log("The mass ratio is ", massRatio);
-
+*/
         var theLabel = document.getElementById("lblCalct0");
         var T0Err = Math.sqrt(ToFRef2Err*ToFRef2Err*(mOverQ1/mOverQ2) + ToFRef1Err*ToFRef1Err)/Math.abs(massRatio-1);
 
@@ -383,7 +384,7 @@ if(ok){
     var DeltaN = AnalyteLaps - ref1Laps;
     ref1ToF.val += DeltaN*bwithErr.val;
     ref1ToF.err += Math.abs(DeltaN)*bwithErr.err;
-    console.log("AnalyteToF is ", analyteToF);
+//    console.log("AnalyteToF is ", analyteToF);
     var rho = (analyteToF.val - t0withErr.val)/(ref1ToF.val - t0withErr.val);
     var m = theCharge2*mOverQ1*rho*rho;
     var MassExcess = (m - Math.round(theMass2))*ukeV + theCharge2*eMasskeV;
@@ -460,7 +461,7 @@ function getMarkup(thisNuclide, charge){
       if(n>1) theAtom = theAtom.concat("<sub>", n).concat("", "</sub>");
       theMarkup = theMarkup.concat("", theAtom);// "<sup>".concat(theJSON.A,"</sup>").concat(theJSON.element,"<sub>").concat(n, "</sub>"));
     }
-    console.log(charge);
+//    console.log(charge);
     if(charge == "1") theMarkup = theMarkup.concat("", "<sup>+</sup>");
     else if(charge == 2) theMarkup = theMarkup.concat("", "<sup>2+</sup>");
     else if(charge == 3) theMarkup = theMarkup.concat("", "<sup>3+</sup>");
@@ -667,7 +668,7 @@ function loadNUBASE(){
     .then((text) => {
       var theWholeTable = new Array();
       theWholeTable = text.split(/\r\n|\n/);       
-      console.log("theWholeTable has %i entries", theWholeTable.length);
+//      console.log("theWholeTable has %i entries", theWholeTable.length);
 //        console.log(theWholeTable.at(0));
       for(let i=0; i<theWholeTable.length; i++){
 //          if(theWholeTable.at(i).at(0) == '#') console.log(theWholeTable.at(i));
@@ -745,7 +746,7 @@ function getChart(mydiv){
         .then((text) => {
           var theWholeTable = new Array();
           theWholeTable = text.split(/\r\n|\n/);       
-          console.log("The periodic table has %i entries", theWholeTable.length);
+//          console.log("The periodic table has %i entries", theWholeTable.length);
           for(let i=0; i<theWholeTable.length; i++){
               var thisData = new Array();
               thisData = theWholeTable.at(i).split(' ');
@@ -854,9 +855,11 @@ function getListOfSelectedIsotopes(){
   var minAbundance = parseFloat(document.getElementById("minAbundance").value);
   var maxRIs = parseFloat(document.getElementById("selMaxRI").value);
   var minHalflife = parseFloat(document.getElementById("minHalflife").value);
+/*
   console.log(minAbundance);
   console.log(maxRIs);
   console.log(minHalflife);
+*/
   for(let i=0; i<theSelectedElements.length; i++){
     var thisElement = theSelectedElements.at(i);
 //    console.log(thisElement);
@@ -980,7 +983,7 @@ async function reallyFindSCM(){
   var t_ref = parseFloat(document.getElementById("ToF_Ref1").value);
   var dt_ref = parseFloat(document.getElementById("ToF_Ref1err").value);
   if(document.getElementById("ToF_Ref1err").value == "") dt_ref = 0;
-  console.log("dt_ref is %f", dt_ref);
+//  console.log("dt_ref is %f", dt_ref);
   var m_ref = parseFloat(document.getElementById("Mass1").innerHTML);
   var q_ref = parseFloat(document.getElementById("selCharge1").value);
   var m_lap = parseFloat(document.getElementById("ref1Laps").value);
@@ -989,6 +992,7 @@ async function reallyFindSCM(){
   var dt_SCM = parseFloat(document.getElementById("ToF_SCMErr").value);
   if(document.getElementById("ToF_SCMErr").value == "") dt_SCM = 0;
   var q_SCM = parseFloat(document.getElementById("selChargeSCM").value);
+ /*
   console.log("q_SCM is %f", q_SCM);
 
   console.log("q_SCM is %f", q_SCM);
@@ -997,17 +1001,18 @@ async function reallyFindSCM(){
   console.log("t_SCM is %f", t_SCM);
   console.log("t0withErr is %f", t0withErr.val);
   console.log("t_ref is %f", t_ref);
-
+*/
   var m_SCM = (q_SCM/q_ref)*(m_ref)*(t_SCM - t0withErr.val)*(t_SCM - t0withErr.val)/((t_ref - t0withErr.val)*(t_ref - t0withErr.val));
   var dm_SCM = Math.sqrt((dt_ref*dt_ref)/(t_ref*t_ref) + (dt_SCM*dt_SCM)/(t_SCM*t_SCM))*m_SCM;
 
   document.getElementById("lblSearching").innerHTML = String(parseFloat(m_SCM).toFixed(8)).concat("±", String(parseFloat(dm_SCM*ukeV).toFixed(1)).concat("", " keV"));   
 
   //calculate mass at lap number
+/*
   console.log("t_0 is %f", t0withErr.val);
   console.log("m_SCM is %f", m_SCM);
   console.log("dm_SCM is %f", dm_SCM);
-
+*/
   var theSelectedIsotopes = getListOfSelectedIsotopes();
   if(theSelectedIsotopes.length == 0) alert("No isotopes to choose from!");
   else{  //Look for match
@@ -1019,6 +1024,7 @@ async function reallyFindSCM(){
     var theCandidate = "";
     var theWinnersList = new Array();
     var maxNumRI = parseInt(document.getElementById("selMaxRI").value);
+    var maxSigma = parseFloat(document.getElementById("maxSigma").value);
 
     if(maxElements == 1) for(let i=0; i<theSelectedIsotopes.length; i++) for(let n=0; n<=maxAtoms; n++){
       theCandidate = String(n).concat("", theSelectedIsotopes.at(i));
@@ -1026,7 +1032,7 @@ async function reallyFindSCM(){
       if(numRI <= maxNumRI){
         var test_mass = getMass(theCandidate, q_SCM);
         var m_dif = m_SCM - test_mass;
-        if(Math.abs(m_dif) < 0.5){
+        if(Math.abs(m_dif) < maxSigma*dm_SCM){
           var sigma = Math.abs(m_dif)/dm_SCM;
           addToTable(theCandidate, test_mass, sigma, m_dif*ukeV, numRI);
         }
@@ -1047,9 +1053,9 @@ async function reallyFindSCM(){
           if(numRI <= maxNumRI){
             var test_mass = getMass(theCandidate, q_SCM);
             var m_dif = m_SCM - test_mass;
-            if(Math.abs(m_dif) < 0.5/q_SCM){
+            if(Math.abs(m_dif) < maxSigma*dm_SCM){
               var sigma = Math.abs(m_dif)/dm_SCM;
-              var alreadyListed = 0;
+                  var alreadyListed = 0;
               for(let winnerIndex=0; winnerIndex<theWinnersList.length; winnerIndex++) 
               if(theWinnersList.at(winnerIndex) == theCandidate) alreadyListed = 1;
               if(alreadyListed == 0){ 
@@ -1100,9 +1106,9 @@ async function reallyFindSCM(){
             if(numRI <= maxNumRI){ 
               var test_mass = getMass(theCandidate, q_SCM); //theSelectedIsotopes.at(i)
               var m_dif = m_SCM - test_mass;
-              if(Math.abs(m_dif) < 0.5/q_SCM){
+              if(Math.abs(m_dif) < maxSigma*dm_SCM){
                 var sigma = Math.abs(m_dif)/dm_SCM;
-                var alreadyListed = 0;
+                      var alreadyListed = 0;
                 for(let winnerIndex=0; winnerIndex<theWinnersList.length; winnerIndex++) 
                   if(theWinnersList.at(winnerIndex) == theCandidate) alreadyListed = 1;
                 if(alreadyListed == 0){ 
@@ -1215,9 +1221,9 @@ async function reallyFindSCM(){
               if(numRI <= maxNumRI){ 
                 var test_mass = getMass(theCandidate, q_SCM); //theSelectedIsotopes.at(i)
                 var m_dif = m_SCM - test_mass;
-                if(Math.abs(m_dif) < 0.5/q_SCM){
+                if(Math.abs(m_dif) < maxSigma*dm_SCM){
                   var sigma = Math.abs(m_dif)/dm_SCM;
-                  var alreadyListed = 0;
+                          var alreadyListed = 0;
                   for(let winnerIndex=0; winnerIndex<theWinnersList.length; winnerIndex++) 
                     if(theWinnersList.at(winnerIndex) == theCandidate) alreadyListed = 1;
                   if(alreadyListed == 0){ 
