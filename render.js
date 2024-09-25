@@ -422,7 +422,7 @@ function getMass(thisNuclide, charge){
   var theMass = 0;
   for(let i=0; i<theAtoms.length; i++){
     var theJSON = NUBASE.find(({nuclide}) => nuclide === theAtoms.at(i).nuclide);
-//    console.log(theJSON);
+    if (typeof myVar !== 'undefined') console.log(theJSON);
     var n= parseFloat(theAtoms.at(i).theNumber);
     theMass += n*theJSON.A*ukeV + theJSON.MassExcess;
   }
@@ -430,8 +430,44 @@ function getMass(thisNuclide, charge){
   theMass /= ukeV;
 //  console.log(theMass);
   return parseFloat(String(theMass)).toFixed(9);
-  
 }
+
+//----------------------------------------------------  
+function getMarkup(thisNuclide, charge){
+  
+    var theNuclides = thisNuclide.split(/;|:/);
+    var theAtoms = new Array();
+    for(let i=0; i<theNuclides.length; i++){
+      const thisPart = theNuclides.at(i);
+      for(let j=0; j<thisPart.length; j++){
+        var thisChar = thisPart.at(j);
+        if(!(thisChar >= '0' && thisChar <= '9')){ 
+          var theNuclide = thisPart.slice(j, thisPart.length);
+          var theNumber = thisPart.slice(0, j);
+          if(j == 0) theNumber = 1;
+          theAtoms.push({nuclide: theNuclide, theNumber: theNumber});
+          j=thisPart.length;
+        }
+      }
+    }
+  
+    var theMass = 0;
+    var theMarkup ="";
+    for(let i=0; i<theAtoms.length; i++){
+      var theJSON = NUBASE.find(({nuclide}) => nuclide === theAtoms.at(i).nuclide);
+      var n= parseFloat(theAtoms.at(i).theNumber);
+      var theAtom ="<sup>".concat(theJSON.A,"</sup>").concat("",theJSON.element);
+      if(n>1) theAtom = theAtom.concat("<sub>", n).concat("", "</sub>");
+      theMarkup = theMarkup.concat("", theAtom);// "<sup>".concat(theJSON.A,"</sup>").concat(theJSON.element,"<sub>").concat(n, "</sub>"));
+    }
+    console.log(charge);
+    if(charge == "1") theMarkup = theMarkup.concat("", "<sup>+</sup>");
+    else if(charge == 2) theMarkup = theMarkup.concat("", "<sup>2+</sup>");
+    else if(charge == 3) theMarkup = theMarkup.concat("", "<sup>3+</sup>");
+
+    return theMarkup;
+  }
+  
 
 //----------------------------------------------------  
 function finalParse(theJSON){
@@ -853,53 +889,49 @@ function fnFindSCM() {
       .then(() => reallyFindSCM())
       .catch(error => console.log(error));
 }
-/*
-function fnFindSCM(){
-
-  async function showProcessing() {
-    document.getElementById("btnFindSCM").innerHTML = "Processing...";   
-  }
-
-  async function awaitShowProcessing(){
-    await showProcessing();
-
-  }
-
-  awaitShowProcessing();
-
-  reallyFindSCM();
-}
-*/
 
 async function reallyFindSCM(){
 
-  var tbl = document.getElementById("SCMTable");
-  tbl.innerHTML = "";
-  tbl.style.maxHeight = "180px";
-  tbl.style.overflow = "auto";
-  tbl.style.display = "block";
-  const tblBody = document.createElement("tbody");
-  tblBody.style.maxHeight = "180px";
-  tblBody.style.overflow = "auto";
-  tblBody.style.display = "block";
-  const headerRow = document.createElement("tr");
-  if(1){
-    const cellMoleculeName = document.createElement("td");
-    const cellTextMoleculeName = document.createTextNode("Molecule");
-    cellMoleculeName.appendChild(cellTextMoleculeName);
-    headerRow.appendChild(cellMoleculeName);
-    const cellMoleculeDevSigma = document.createElement("td");
-    const cellTextMoleculeDevSigma = document.createTextNode("σ");
-    cellMoleculeDevSigma.appendChild(cellTextMoleculeDevSigma);
-    headerRow.appendChild(cellMoleculeDevSigma);
-    const cellMoleculeDevKeV = document.createElement("td");
-    const cellTextMoleculeDevKeV = document.createTextNode("Δm [keV/c^2]");
-    cellMoleculeDevKeV.appendChild(cellTextMoleculeDevKeV);
-    headerRow.appendChild(cellMoleculeDevKeV);
-    tblBody.appendChild(headerRow);
-    tbl.appendChild(tblBody);
-    tbl.setAttribute("border", "1");
+  async function addToTable(name, mass, sdev, mdev){
+    return new Promise(resolve => {
+      const row = document.createElement("tr");
+
+      const cellMoleculeName = document.createElement("td");
+      const cellTextMoleculeName = document.createTextNode(name);
+      cellMoleculeName.appendChild(cellTextMoleculeName);
+      cellMoleculeName.innerHTML = getMarkup(name, parseFloat(document.getElementById("selChargeSCM").value));
+      cellMoleculeName.style.width = "80px";
+      row.appendChild(cellMoleculeName);
+
+      const cellMoleculeMass = document.createElement("td");
+      const cellTextMoleculeMass = document.createTextNode(parseFloat(mass).toFixed(9));
+      cellMoleculeMass.appendChild(cellTextMoleculeMass);
+      cellMoleculeMass.style.width = "80px";
+      row.appendChild(cellMoleculeMass);
+
+      const cellMoleculeDevSigma = document.createElement("td");
+      const cellTextMoleculeDevSigma = document.createTextNode(sdev.toFixed(2));
+      cellMoleculeDevSigma.appendChild(cellTextMoleculeDevSigma);
+      cellMoleculeDevSigma.style.width = "80px";
+      row.appendChild(cellMoleculeDevSigma);
+      
+      const cellMoleculeDevKeV = document.createElement("td");
+      const cellTextMoleculeDevKeV = document.createTextNode(mdev.toFixed(1));
+      cellMoleculeDevKeV.appendChild(cellTextMoleculeDevKeV);
+      cellMoleculeDevKeV.style.width = "80px";
+      row.appendChild(cellMoleculeDevKeV);
+      
+      tblBody.appendChild(row);
+//      document.getElementById("SCMTable").appendChild(tblBody);
+      resolve();
+    });
   }
+
+  var tbl = document.getElementById("SCMTable");
+  tbl.innerHTML = "<thead><tr><th>Molecule</th><th>Mass [u]</th><th>Δm [σ]</th><th>Δm [keV]</th></tr></thead>";
+  const tblBody = document.createElement("tbody");
+  tbl.setAttribute("border", "1");
+  tbl.appendChild(tblBody);
 
   var maxElements = parseInt(document.getElementById("selMaxElements").value);
   var maxAtoms = parseInt(document.getElementById("selMaxAtoms").value);
@@ -946,31 +978,15 @@ async function reallyFindSCM(){
     if(maxElements == 1) for(let i=0; i<theSelectedIsotopes.length; i++) for(let n=0; n<=maxAtoms; n++){
       theCandidate = String(n).concat("", theSelectedIsotopes.at(i));
 //      console.log(theCandidate);
-      var test_mass = getMass(theCandidate, q_SCM); //theSelectedIsotopes.at(i)
-      var m_dif = Math.abs(m_SCM - test_mass);
-      if(m_dif < 0.5/q_SCM){
-        var sigma = m_dif/dm_SCM;
+      var test_mass = getMass(theCandidate, q_SCM)/q_SCM; //theSelectedIsotopes.at(i)
+      var m_dif = m_SCM - test_mass;
+      if(Math.abs(m_dif) < 0.5/q_SCM){
+        var sigma = Math.abs(m_dif)/dm_SCM;
         console.log("test_nuclide is %s", theCandidate);//theSelectedIsotopes.at(i));
         console.log("test_mass is %f", test_mass);
         console.log("the difference is %f sigma", sigma);
-        tblBody.style.maxHeight = "180px";
-        tblBody.style.height = "180px";
-        tblBody.style.overflow = "auto";
-        const row = document.createElement("tr");
-        const cellMoleculeName = document.createElement("td");
-        const cellTextMoleculeName = document.createTextNode(theCandidate);
-        cellMoleculeName.appendChild(cellTextMoleculeName);
-        row.appendChild(cellMoleculeName);
-        const cellMoleculeDevSigma = document.createElement("td");
-        const cellTextMoleculeDevSigma = document.createTextNode(sigma);
-        cellMoleculeDevSigma.appendChild(cellTextMoleculeDevSigma);
-        row.appendChild(cellMoleculeDevSigma);
-        const cellMoleculeDevKeV = document.createElement("td");
-        const cellTextMoleculeDevKeV = document.createTextNode(m_dif*ukeV);
-        cellMoleculeDevKeV.appendChild(cellTextMoleculeDevKeV);
-        row.appendChild(cellMoleculeDevKeV);
-        tblBody.appendChild(row);
-        tbl.appendChild(tblBody);
+        addToTable(theCandidate, test_mass, sigma, m_dif*ukeV);
+
       }
     }
     if(maxElements == 2) for(let i=0; i<theSelectedIsotopes.length; i++) for(let n=0; n<=maxAtoms; n++){
@@ -984,9 +1000,9 @@ async function reallyFindSCM(){
         else theCandidate = theCandidatePart1.concat(";", theCandidatePart2);
         if(theCandidate != ""){
           var test_mass = getMass(theCandidate, q_SCM); //theSelectedIsotopes.at(i)
-          var m_dif = Math.abs(m_SCM - test_mass);
-          if(m_dif < 0.5/q_SCM){
-            var sigma = m_dif/dm_SCM;
+          var m_dif = m_SCM - test_mass;
+          if(Math.abs(m_dif) < 0.5/q_SCM){
+            var sigma = Math.abs(m_dif)/dm_SCM;
             var alreadyListed = 0;
             for(let winnerIndex=0; winnerIndex<theWinnersList.length; winnerIndex++) 
               if(theWinnersList.at(winnerIndex) == theCandidate) alreadyListed = 1;
@@ -995,30 +1011,12 @@ async function reallyFindSCM(){
               console.log("test_nuclide is %s", theCandidate);//theSelectedIsotopes.at(i));
               console.log("test_mass is %f", test_mass);
               console.log("the difference is %f sigma", sigma);
-
-              var sigma = m_dif/dm_SCM;
-              console.log("test_nuclide is %s", theCandidate);//theSelectedIsotopes.at(i));
-              console.log("test_mass is %f", test_mass);
-              console.log("the difference is %f sigma", sigma);
-              tblBody.style.maxHeight = "180px";
-              tblBody.style.height = "180px";
-              tblBody.style.overflow = "scroll";
-              tblBody.style.overflowY = "scroll";
-              const row = document.createElement("tr");
-              const cellMoleculeName = document.createElement("td");
-              const cellTextMoleculeName = document.createTextNode(theCandidate);
-              cellMoleculeName.appendChild(cellTextMoleculeName);
-              row.appendChild(cellMoleculeName);
-              const cellMoleculeDevSigma = document.createElement("td");
-              const cellTextMoleculeDevSigma = document.createTextNode(sigma);
-              cellMoleculeDevSigma.appendChild(cellTextMoleculeDevSigma);
-              row.appendChild(cellMoleculeDevSigma);
-              const cellMoleculeDevKeV = document.createElement("td");
-              const cellTextMoleculeDevKeV = document.createTextNode(m_dif*ukeV);
-              cellMoleculeDevKeV.appendChild(cellTextMoleculeDevKeV);
-              row.appendChild(cellMoleculeDevKeV);
-              tblBody.appendChild(row);
-              tbl.appendChild(tblBody);
+              addToTable(theCandidate, test_mass, sigma, m_dif*ukeV)
+                .then(() => {
+                  // Allow UI to update before calling the next function
+                  return new Promise(resolve => setTimeout(resolve, 100));
+                })
+                .catch(error => console.log(error));
               console.log(tblBody.style.height);
             }
           }
@@ -1035,28 +1033,37 @@ async function reallyFindSCM(){
           var theCandidatePart3 = "";
           if(n3 != 0) theCandidatePart3 = String(n3).concat("", theSelectedIsotopes.at(i3));
           if(n == 0){
-            if(n3 == 0) theCandidate = theCandidatePart2;
-            else if(n2 == 0) theCandidate = theCandidatePart3;
+            if(n2 == 0) theCandidate = theCandidatePart3;
+            else if(n3 == 0) theCandidate = theCandidatePart2;
             else theCandidate = theCandidatePart2.concat(";", theCandidatePart3);
           }
           else if(n2 == 0){
-            if(n3 == 0) theCandidate = theCandidatePart1;
+            if(n == 0) theCandidate = theCandidatePart3;
+            else if(n3 == 0) theCandidate = theCandidatePart1;
             else theCandidate = theCandidatePart1.concat(";", theCandidatePart3);
+          }
+          else if(n3 == 0){
+            if(n == 0) theCandidate = theCandidatePart2;
+            if(n2 == 0) theCandidate = theCandidatePart1;
+            else theCandidate = theCandidatePart1.concat(";", theCandidatePart2);
           }
           else theCandidate = theCandidatePart1.concat(";", theCandidatePart2.concat(";", theCandidatePart3));
           if(theCandidate != ""){
             var test_mass = getMass(theCandidate, q_SCM); //theSelectedIsotopes.at(i)
-            var m_dif = Math.abs(m_SCM - test_mass);
-            if(m_dif < 0.5/q_SCM){
-              var sigma = m_dif/dm_SCM;
+            var m_dif = m_SCM - test_mass;
+            if(Math.abs(m_dif) < 0.5/q_SCM){
+              var sigma = Math.abs(m_dif)/dm_SCM;
               var alreadyListed = 0;
               for(let winnerIndex=0; winnerIndex<theWinnersList.length; winnerIndex++) 
                 if(theWinnersList.at(winnerIndex) == theCandidate) alreadyListed = 1;
               if(alreadyListed == 0){ 
                 theWinnersList.push(theCandidate);
-                console.log("test_nuclide is %s", theCandidate);//theSelectedIsotopes.at(i));
-                console.log("test_mass is %f", test_mass);
-                console.log("the difference is %f sigma", sigma);
+                addToTable(theCandidate, test_mass, sigma, m_dif*ukeV)
+                .then(() => {
+                  // Allow UI to update before calling the next function
+                  return new Promise(resolve => setTimeout(resolve, 100));
+                })
+                .catch(error => console.log(error));
               }
             }
           }
@@ -1066,5 +1073,5 @@ async function reallyFindSCM(){
 
   }
   document.getElementById("btnFindSCM").innerHTML = "Find Them!";   
-//  document.getElementById("lblSearching").text = "...";
+
 }
