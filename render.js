@@ -424,7 +424,7 @@ function getMass(thisNuclide, charge){
     var theJSON = NUBASE.find(({nuclide}) => nuclide === theAtoms.at(i).nuclide);
     if (typeof myVar !== 'undefined') console.log(theJSON);
     var n= parseFloat(theAtoms.at(i).theNumber);
-    theMass += n*theJSON.A*ukeV + theJSON.MassExcess;
+    theMass += n*(theJSON.A*ukeV + theJSON.MassExcess);
   }
   theMass -= parseFloat(charge)*eMasskeV;
   theMass /= ukeV;
@@ -799,6 +799,7 @@ function getChart(mydiv){
 
   return symbols;
 }
+//----------------------------------------------------  
 
 function getElementIndex(theElement){
   for(let i=0; i<periodicData.length;i++){
@@ -806,6 +807,7 @@ function getElementIndex(theElement){
   }
   return -1;
 }
+//----------------------------------------------------  
 
 function fnSelectNone(){
   for(let i=0; i<periodicData.length;i++){
@@ -816,6 +818,7 @@ function fnSelectNone(){
   }
   console.log("Nothing?");
 }
+//----------------------------------------------------  
 
 function fnStandardSelection(){
   var standardArray = ["H", "C", "N", "O", "F", "S", "Ar"];
@@ -830,6 +833,7 @@ function fnStandardSelection(){
 
   getListOfSelectedIsotopes();
 }
+//----------------------------------------------------  
 
 function getListOfSelectedElements(){
   var selectedElements = new Array();
@@ -842,6 +846,7 @@ function getListOfSelectedElements(){
 
   return selectedElements;
 }
+//----------------------------------------------------  
 
 function getListOfSelectedIsotopes(){
   var theSelectedIsotopes = new Array();
@@ -872,6 +877,7 @@ function getListOfSelectedIsotopes(){
   }
   return theSelectedIsotopes;
 }
+//----------------------------------------------------  
 
 function fnFindSCM() {
   async function showProcessing() {
@@ -884,15 +890,45 @@ function fnFindSCM() {
   showProcessing()
       .then(() => {
           // Allow UI to update before calling the next function
-          return new Promise(resolve => setTimeout(resolve, 10));
+          return new Promise(resolve => setTimeout(resolve, 100));
       })
       .then(() => reallyFindSCM())
       .catch(error => console.log(error));
 }
+//----------------------------------------------------  
+
+function howRadioactive(name){
+  var numRI = 0;
+  var theNuclides = name.split(/;|:/);
+  var theAtoms = new Array();
+  for(let i=0; i<theNuclides.length; i++){
+    const thisPart = theNuclides.at(i);
+    for(let j=0; j<thisPart.length; j++){
+      var thisChar = thisPart.at(j);
+      if(!(thisChar >= '0' && thisChar <= '9')){ 
+        var theNuclide = thisPart.slice(j, thisPart.length);
+        var theNumber = thisPart.slice(0, j);
+        if(j == 0) theNumber = 1;
+        theAtoms.push({nuclide: theNuclide, theNumber: theNumber});
+        j=thisPart.length;
+      }
+    }
+  }
+
+  var theMass = 0;
+  for(let i=0; i<theAtoms.length; i++){
+    var theJSON = NUBASE.find(({nuclide}) => nuclide === theAtoms.at(i).nuclide);
+    if (typeof myVar !== 'undefined') console.log(theJSON);
+    var n= parseFloat(theAtoms.at(i).theNumber);
+    if(theJSON.abundance == 0) numRI += n;    
+  }
+  return numRI;
+}
+//----------------------------------------------------  
 
 async function reallyFindSCM(){
 
-  async function addToTable(name, mass, sdev, mdev){
+  async function addToTable(name, mass, sdev, mdev, numRI){
     return new Promise(resolve => {
       const row = document.createElement("tr");
 
@@ -921,8 +957,8 @@ async function reallyFindSCM(){
       cellMoleculeDevKeV.style.width = "80px";
       row.appendChild(cellMoleculeDevKeV);
       
+      if(numRI > 0) row.style.backgroundColor = "pink";
       tblBody.appendChild(row);
-//      document.getElementById("SCMTable").appendChild(tblBody);
       resolve();
     });
   }
@@ -962,8 +998,10 @@ async function reallyFindSCM(){
   console.log("t0withErr is %f", t0withErr.val);
   console.log("t_ref is %f", t_ref);
 
-  var m_SCM = q_SCM*(m_ref/q_ref)*(t_SCM - t0withErr.val)*(t_SCM - t0withErr.val)/((t_ref - t0withErr.val)*(t_ref - t0withErr.val));
+  var m_SCM = (q_SCM/q_ref)*(m_ref)*(t_SCM - t0withErr.val)*(t_SCM - t0withErr.val)/((t_ref - t0withErr.val)*(t_ref - t0withErr.val));
   var dm_SCM = Math.sqrt((dt_ref*dt_ref)/(t_ref*t_ref) + (dt_SCM*dt_SCM)/(t_SCM*t_SCM))*m_SCM;
+
+  document.getElementById("lblSearching").innerHTML = String(parseFloat(m_SCM).toFixed(8)).concat("±", String(parseFloat(dm_SCM*ukeV).toFixed(1)).concat("", " keV"));   
 
   //calculate mass at lap number
   console.log("t_0 is %f", t0withErr.val);
@@ -973,22 +1011,28 @@ async function reallyFindSCM(){
   var theSelectedIsotopes = getListOfSelectedIsotopes();
   if(theSelectedIsotopes.length == 0) alert("No isotopes to choose from!");
   else{  //Look for match
+    var combinations = maxElements*Math.pow(theSelectedIsotopes.length*maxAtoms, maxElements)*5e-7;
+    combinations = parseFloat(combinations).toFixed(0);
+    var warningText = "This may takes ".concat(combinations," seconds or more.  Please be patient");
+    if(combinations > 15) alert(warningText);
+
     var theCandidate = "";
     var theWinnersList = new Array();
+    var maxNumRI = parseInt(document.getElementById("selMaxRI").value);
+
     if(maxElements == 1) for(let i=0; i<theSelectedIsotopes.length; i++) for(let n=0; n<=maxAtoms; n++){
       theCandidate = String(n).concat("", theSelectedIsotopes.at(i));
-//      console.log(theCandidate);
-      var test_mass = getMass(theCandidate, q_SCM)/q_SCM; //theSelectedIsotopes.at(i)
-      var m_dif = m_SCM - test_mass;
-      if(Math.abs(m_dif) < 0.5/q_SCM){
-        var sigma = Math.abs(m_dif)/dm_SCM;
-        console.log("test_nuclide is %s", theCandidate);//theSelectedIsotopes.at(i));
-        console.log("test_mass is %f", test_mass);
-        console.log("the difference is %f sigma", sigma);
-        addToTable(theCandidate, test_mass, sigma, m_dif*ukeV);
-
+      var numRI = howRadioactive(theCandidate);
+      if(numRI <= maxNumRI){
+        var test_mass = getMass(theCandidate, q_SCM);
+        var m_dif = m_SCM - test_mass;
+        if(Math.abs(m_dif) < 0.5){
+          var sigma = Math.abs(m_dif)/dm_SCM;
+          addToTable(theCandidate, test_mass, sigma, m_dif*ukeV, numRI);
+        }
       }
     }
+
     if(maxElements == 2) for(let i=0; i<theSelectedIsotopes.length; i++) for(let n=0; n<=maxAtoms; n++){
       var theCandidatePart1 = "";
       if(n != 0) theCandidatePart1 = String(n).concat("", theSelectedIsotopes.at(i));
@@ -999,30 +1043,33 @@ async function reallyFindSCM(){
         else if(n2 == 0) theCandidate = theCandidatePart1;
         else theCandidate = theCandidatePart1.concat(";", theCandidatePart2);
         if(theCandidate != ""){
-          var test_mass = getMass(theCandidate, q_SCM); //theSelectedIsotopes.at(i)
-          var m_dif = m_SCM - test_mass;
-          if(Math.abs(m_dif) < 0.5/q_SCM){
-            var sigma = Math.abs(m_dif)/dm_SCM;
-            var alreadyListed = 0;
-            for(let winnerIndex=0; winnerIndex<theWinnersList.length; winnerIndex++) 
+          var numRI = howRadioactive(theCandidate);
+          if(numRI <= maxNumRI){
+            var test_mass = getMass(theCandidate, q_SCM);
+            var m_dif = m_SCM - test_mass;
+            if(Math.abs(m_dif) < 0.5/q_SCM){
+              var sigma = Math.abs(m_dif)/dm_SCM;
+              var alreadyListed = 0;
+              for(let winnerIndex=0; winnerIndex<theWinnersList.length; winnerIndex++) 
               if(theWinnersList.at(winnerIndex) == theCandidate) alreadyListed = 1;
-            if(alreadyListed == 0){ 
-              theWinnersList.push(theCandidate);
-              console.log("test_nuclide is %s", theCandidate);//theSelectedIsotopes.at(i));
-              console.log("test_mass is %f", test_mass);
-              console.log("the difference is %f sigma", sigma);
-              addToTable(theCandidate, test_mass, sigma, m_dif*ukeV)
-                .then(() => {
-                  // Allow UI to update before calling the next function
-                  return new Promise(resolve => setTimeout(resolve, 100));
-                })
-                .catch(error => console.log(error));
-              console.log(tblBody.style.height);
+              if(alreadyListed == 0){ 
+                theWinnersList.push(theCandidate);
+//                console.log("test_nuclide is %s", theCandidate);
+//                console.log("test_mass is %f", test_mass);
+//                console.log("the difference is %f sigma", sigma);
+                addToTable(theCandidate, test_mass, sigma, m_dif*ukeV, numRI)
+                  .then(() => {
+                    // Allow UI to update before calling the next function
+                    return new Promise(resolve => setTimeout(resolve, 100));
+                  })
+                  .catch(error => console.log(error));
+              }
             }
           }
         }
       }
     }
+
     if(maxElements == 3) for(let i=0; i<theSelectedIsotopes.length; i++) for(let n=0; n<=maxAtoms; n++){
       var theCandidatePart1 = "";
       if(n != 0) theCandidatePart1 = String(n).concat("", theSelectedIsotopes.at(i));
@@ -1049,27 +1096,148 @@ async function reallyFindSCM(){
           }
           else theCandidate = theCandidatePart1.concat(";", theCandidatePart2.concat(";", theCandidatePart3));
           if(theCandidate != ""){
-            var test_mass = getMass(theCandidate, q_SCM); //theSelectedIsotopes.at(i)
-            var m_dif = m_SCM - test_mass;
-            if(Math.abs(m_dif) < 0.5/q_SCM){
-              var sigma = Math.abs(m_dif)/dm_SCM;
-              var alreadyListed = 0;
-              for(let winnerIndex=0; winnerIndex<theWinnersList.length; winnerIndex++) 
-                if(theWinnersList.at(winnerIndex) == theCandidate) alreadyListed = 1;
-              if(alreadyListed == 0){ 
-                theWinnersList.push(theCandidate);
-                addToTable(theCandidate, test_mass, sigma, m_dif*ukeV)
-                .then(() => {
-                  // Allow UI to update before calling the next function
-                  return new Promise(resolve => setTimeout(resolve, 100));
-                })
-                .catch(error => console.log(error));
+            var numRI = howRadioactive(theCandidate);
+            if(numRI <= maxNumRI){ 
+              var test_mass = getMass(theCandidate, q_SCM); //theSelectedIsotopes.at(i)
+              var m_dif = m_SCM - test_mass;
+              if(Math.abs(m_dif) < 0.5/q_SCM){
+                var sigma = Math.abs(m_dif)/dm_SCM;
+                var alreadyListed = 0;
+                for(let winnerIndex=0; winnerIndex<theWinnersList.length; winnerIndex++) 
+                  if(theWinnersList.at(winnerIndex) == theCandidate) alreadyListed = 1;
+                if(alreadyListed == 0){ 
+                  theWinnersList.push(theCandidate);
+                  addToTable(theCandidate, test_mass, sigma, m_dif*ukeV, numRI)
+                  .then(() => {
+                    // Allow UI to update before calling the next function
+                    return new Promise(resolve => setTimeout(resolve, 100));
+                  })
+                  .catch(error => console.log(error));
+                }
               }
             }
           }
         }
       }
     }
+
+    if(maxElements == 4) for(let i=0; i<theSelectedIsotopes.length; i++) for(let n=0; n<=maxAtoms; n++){
+      var theCandidatePart1 = "";
+      if(n != 0) theCandidatePart1 = String(n).concat("", theSelectedIsotopes.at(i));
+      for(let i2=i+1; i2<theSelectedIsotopes.length; i2++) for(let n2=0; n2<=maxAtoms; n2++){
+        var theCandidatePart2 = "";
+        if(n2 != 0) theCandidatePart2 = String(n2).concat("", theSelectedIsotopes.at(i2));
+        for(let i3=i2+1; i3<theSelectedIsotopes.length; i3++) for(let n3=0; n3<=maxAtoms; n3++){
+          var theCandidatePart3 = "";
+          if(n3 != 0) theCandidatePart3 = String(n3).concat("", theSelectedIsotopes.at(i3));
+          for(let i4=i3+1; i4<theSelectedIsotopes.length; i4++) for(let n4=0; n4<maxAtoms; n4++){
+            var theCandidatePart4 = "";
+            if(n4 != 0) theCandidatePart4 = String(n4).concat("", theSelectedIsotopes.at(i4));
+
+            if(n == 0){
+              if(n2 == 0){
+                if(n4 == 0) theCandidate = theCandidatePart3;
+                else if(n3 == 0) theCandidate = theCandidatePart4;
+                else theCandidate = theCandidatePart3.concat(";", theCandidatePart4);
+              } 
+              else if(n3 == 0){
+                if(n4 == 0) theCandidate = theCandidatePart2;
+                else if(n2 == 0) theCandidate = theCandidatePart4;
+                else theCandidate = theCandidatePart2.concat(";", theCandidatePart4);
+              }
+              else if(n4 == 0){
+                if(n3 == 0) theCandidate = theCandidatePart2;
+                else if(n2 == 0) theCandidate = theCandidatePart3;
+                else theCandidate = theCandidatePart2.concat(";", theCandidatePart3);
+              }
+              else theCandidate = theCandidatePart2.concat(";", theCandidatePart3.concat(";", theCandidatePart4));
+            }
+
+            else if(n2 == 0){
+              if(n4 == 0){
+                if(n3 == 0) theCandidate = theCandidatePart1;
+                else if(n == 0) theCandidate = theCandidatePart3;
+                else theCandidate = theCandidatePart1.concat(";", theCandidatePart3);
+              } 
+              else if(n3 == 0){
+                if(n4 == 0) theCandidate = theCandidatePart1;
+                else if(n2 == 0) theCandidate = theCandidatePart4;
+                else theCandidate = theCandidatePart1.concat(";", theCandidatePart4);
+              }
+              else if(n == 0){
+                if(n3 == 0) theCandidate = theCandidatePart4;
+                else if(n4 == 0) theCandidate = theCandidatePart3;
+                else theCandidate = theCandidatePart3.concat(";", theCandidatePart4);
+              }
+              else theCandidate = theCandidatePart1.concat(";", theCandidatePart3.concat(";", theCandidatePart4));
+            }
+
+            else if(n3 == 0){
+              if(n4 == 0){
+                if(n2 == 0) theCandidate = theCandidatePart1;
+                else if(n == 0) theCandidate = theCandidatePart2;
+                else theCandidate = theCandidatePart1.concat(";", theCandidatePart2);
+              } 
+              else if(n2 == 0){
+                if(n4 == 0) theCandidate = theCandidatePart1;
+                else if(n == 0) theCandidate = theCandidatePart4;
+                else theCandidate = theCandidatePart1.concat(";", theCandidatePart4);
+              }
+              else if(n == 0){
+                if(n4 == 0) theCandidate = theCandidatePart2;
+                else if(n2 == 0) theCandidate = theCandidatePart4;
+                else theCandidate = theCandidatePart2.concat(";", theCandidatePart4);
+              }
+              else theCandidate = theCandidatePart1.concat(";", theCandidatePart2.concat(";", theCandidatePart4));            
+            }
+
+            else if(n4 == 0){
+              if(n3 == 0){
+                if(n2 == 0) theCandidate = theCandidatePart1;
+                else if(n == 0) theCandidate = theCandidatePart2;
+                else theCandidate = theCandidatePart1.concat(";", theCandidatePart2);
+              } 
+              else if(n2 == 0){
+                if(n3 == 0) theCandidate = theCandidatePart1;
+                else if(n == 0) theCandidate = theCandidatePart3;
+                else theCandidate = theCandidatePart1.concat(";", theCandidatePart3);
+              }
+              else if(n == 0){
+                if(n3 == 0) theCandidate = theCandidatePart2;
+                else if(n2 == 0) theCandidate = theCandidatePart3;
+                else theCandidate = theCandidatePart2.concat(";", theCandidatePart3);
+              }
+              else theCandidate = theCandidatePart1.concat(";", theCandidatePart2.concat(";", theCandidatePart3));  
+            }
+            else theCandidate = theCandidatePart1.concat(";", theCandidatePart2.concat(";", theCandidatePart3.concat(";", theCandidatePart4)));
+            if(theCandidate != ""){
+              var numRI = howRadioactive(theCandidate);
+              if(numRI <= maxNumRI){ 
+                var test_mass = getMass(theCandidate, q_SCM); //theSelectedIsotopes.at(i)
+                var m_dif = m_SCM - test_mass;
+                if(Math.abs(m_dif) < 0.5/q_SCM){
+                  var sigma = Math.abs(m_dif)/dm_SCM;
+                  var alreadyListed = 0;
+                  for(let winnerIndex=0; winnerIndex<theWinnersList.length; winnerIndex++) 
+                    if(theWinnersList.at(winnerIndex) == theCandidate) alreadyListed = 1;
+                  if(alreadyListed == 0){ 
+                    theWinnersList.push(theCandidate);
+                    addToTable(theCandidate, test_mass, sigma, m_dif*ukeV, numRI)
+                    .then(() => {
+                      // Allow UI to update before calling the next function
+                      return new Promise(resolve => setTimeout(resolve, 100));
+                    })
+                    .catch(error => console.log(error));
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+
+    if(maxElements > 4) alert("So many nuclides not implented yet")
 
   }
   document.getElementById("btnFindSCM").innerHTML = "Find Them!";   
