@@ -14,3 +14,16 @@ from AME21 from a provided analyte time-of-flight.
 If the lap number is not known for reference #2 or for the analyte, it can be determined 
 by supplying the ejection time from the MRTOF if values for b and t0 are provided or have 
 been calculated already.
+
+The provided files are for building Electron app.  For testing:
+    git clone https://github.com/phschury/calcme.git
+    cd calcme
+    npm install
+    npm start
+
+To build:
+    npm install
+    npm run make
+
+
+A Javascript version for use with web server is available in /ufo_finder_web_static
