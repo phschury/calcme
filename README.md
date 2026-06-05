@@ -16,13 +16,19 @@ by supplying the ejection time from the MRTOF if values for b and t0 are provide
 been calculated already.
 
 The provided files are for building Electron app.  For testing:
+
     git clone https://github.com/phschury/calcme.git
+    
     cd calcme
+    
     npm install
+    
     npm start
 
 To build:
+
     npm install
+    
     npm run make
 
 
