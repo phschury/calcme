@@ -2,6 +2,11 @@
 
 // Modules to control application life and create native browser window
 const { app, BrowserWindow, Menu, MenuItem, ipcMain } = require('electron')
+
+if (require('electron-squirrel-startup')) {
+  app.quit();
+}
+
 const isMac = process.platform === 'darwin'
 const path = require('node:path')
 
@@ -11,7 +16,11 @@ const createWindow = () => {
     width: 735,
     height: 730,
     resizable: false,
-    icon: path.join(__dirname, 'assets/icon.png'),
+//    icon: path.join(__dirname, 'assets/icon.png'),
+    icon: path.join(
+      __dirname,
+      process.platform === 'win32' ? 'assets/icon.ico' : 'assets/icon.png'
+    ),
     webPreferences: {
       preload: path.join(__dirname, 'preload.js')
     }

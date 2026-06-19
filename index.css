@@ -1,3 +1,18 @@
+#userManualLink {
+    position: absolute;
+    top: 8px;
+    right: 15px;
+    z-index: 100;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 14px;
+    font-weight: bold;
+    text-decoration: none;
+}
+
+#userManualLink:hover {
+    text-decoration: underline;
+}
+
 #mirrorLeft{
     position: absolute;
     left: 0px;
@@ -1054,4 +1069,16 @@ tbody{
 #table {
     border-collapse: collapse;
     border-spacing: 0;
-  }
+}
+
+#githubFooter {
+    display: none;
+    position: absolute;
+    left: 8px;
+    top: 700px;
+    width: 700px;
+    font-size: 12px;
+    text-align: center;
+    font-family: Arial, Helvetica, sans-serif;
+    z-index: 10;
+}

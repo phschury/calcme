@@ -1,23 +1,10 @@
-const DEFAULT_T0_ERR_NS = 10;
-let warnedAboutT0Mismatch = false;
-
-const DEFAULT_B_ERR_NS = 1;
-let warnedAboutBMismatch = false;
-
-const LAST_REF_SETTINGS_KEY = "ufoFinderLastRefSettings";
-
-const githubFooter = document.getElementById("githubFooter");
-if(githubFooter && !runningInElectron()){
-  githubFooter.style.display = "block";
-}
-
 var ukeV = 931494.10372;
 var eMasskeV = 510.99895069;
 var NUBASE = new Array();
 var nubaseByNuclide = new Map();
 
-var t0withErr = {val: 125, err: 10};
-var bwithErr = {val: 26497, err: 1};
+var t0withErr = {val: 125, err: 0};
+var bwithErr = {val: 0, err: 0};
 NUBASE = loadNUBASE();
 var periodicData = getChart(document.getElementById("divPeriodicTable"));
 
@@ -124,110 +111,6 @@ btnStandardSelection = document.getElementById("btnSelectStandardSet");
 btnFindSCM = document.getElementById("btnFindSCM");
   btnFindSCM.addEventListener("click", fnFindSCM, false);
 
-localStorage.removeItem("ufoFinderLastRefSettings");
-
-[
-  "NameRef1", "ToF_Ref1", "ToF_Ref1err", "ref1Laps",
-  "NameRef2", "ToF_Ref2", "ToF_Ref2err", "ref2Laps",
-  "bEstimate", "t0"
-].forEach(id => {
-  const el = document.getElementById(id);
-  if(el) el.addEventListener("change", saveLastRefSettings);
-});
-
-loadLastRefSettings();
-
-//----------------------------------------------------
-function showSCMHeaderMenu(x, y) {
-  let menu = document.getElementById("SCMHeaderContextMenu");
-
-  if(!menu){
-    menu = document.createElement("div");
-    menu.id = "SCMHeaderContextMenu";
-    menu.style.position = "fixed";
-    menu.style.zIndex = "9999";
-    menu.style.background = "white";
-    menu.style.border = "1px solid #555";
-    menu.style.padding = "4px";
-    menu.style.fontFamily = "Arial, Helvetica, sans-serif";
-    menu.style.fontSize = "12px";
-    menu.style.boxShadow = "2px 2px 6px rgba(0,0,0,0.25)";
-
-    const saveText = document.createElement("div");
-    saveText.textContent = "Save table to text file";
-    saveText.style.padding = "4px 10px";
-    saveText.onclick = () => {
-      const csv = makeSCMTableCSV();
-
-      if(csv.trim() === ""){
-        alert("No table data to save.");
-        hideSCMHeaderMenu();
-        return;
-      }
-
-      downloadTextFile("ufo_finder_results.csv", csv);
-      hideSCMHeaderMenu();
-    };
-
-    const copyText = document.createElement("div");
-    copyText.textContent = "Copy table to clipboard";
-    copyText.style.padding = "4px 10px";
-    copyText.onclick = async () => {
-      const csv = makeSCMTableCSV();
-
-      if(csv.trim() === ""){
-        alert("No table data to copy.");
-        hideSCMHeaderMenu();
-        return;
-      }
-
-      try {
-        await navigator.clipboard.writeText(csv);
-        alert("UFO finder table copied to clipboard.");
-      } catch(err) {
-        console.error(err);
-        alert("Could not copy table to clipboard.");
-      }
-
-      hideSCMHeaderMenu();
-    };
-
-    menu.appendChild(saveText);
-    menu.appendChild(copyText);
-    document.body.appendChild(menu);
-  }
-
-  menu.style.left = `${x}px`;
-  menu.style.top = `${y}px`;
-  menu.style.display = "block";
-}
-
-function hideSCMHeaderMenu() {
-  const menu = document.getElementById("SCMHeaderContextMenu");
-  if(menu) menu.style.display = "none";
-}
-
-const scmHeader = document.querySelector("#SCMTable thead");
-if(scmHeader){
-  scmHeader.addEventListener("click", function(e){
-    e.preventDefault();
-    showSCMHeaderMenu(e.clientX, e.clientY);
-  });
-
-  scmHeader.addEventListener("contextmenu", function(e){
-    e.preventDefault();
-    showSCMHeaderMenu(e.clientX, e.clientY);
-  });
-}
-
-document.addEventListener("click", function(e){
-  const menu = document.getElementById("SCMHeaderContextMenu");
-  if(menu && !menu.contains(e.target) && !e.target.closest("#SCMTable thead")){
-    hideSCMHeaderMenu();
-  }
-});
-//----------------------------------------------------
-
 document.addEventListener("copy", function(e) {
   const selection = window.getSelection();
   if (!selection.rangeCount) return;
@@ -243,14 +126,16 @@ document.addEventListener("copy", function(e) {
   }
 });
 
-if (window.electronAPI && window.electronAPI.onMenuClearT0) {
+// Electron builds expose window.electronAPI from preload.js.
+// In the static web version there is no preload script, so guard this callback.
+if (window.electronAPI && typeof window.electronAPI.onMenuClearT0 === "function") {
   window.electronAPI.onMenuClearT0((value) => {
-      t0withErr = {val: 125, err: 0};
-      document.getElementById("lblCalct0").innerHTML = "...";
-      document.getElementById("t0").value = 125;
-      console.log(periodicData);
-      console.log(periodicData.length);
-    });
+    t0withErr = {val: 125, err: 0};
+    document.getElementById("lblCalct0").innerHTML = "...";
+    document.getElementById("t0").value = 125;
+    console.log(periodicData);
+    console.log(periodicData.length);
+  });
 }
  
 //----------------------------------------------------    
@@ -258,7 +143,7 @@ function chkValue(e){
 
   if(e.key != "ArrowRight" && e.key != "ArrowLeft" && e.key != "Tab"){
     if(!this.badKey === true){
-      this.style.backgroundColor = "white"; //set back to yellow if change highlighting is desired
+      this.style.backgroundColor = "yellow";
       this.hasChanged = "true";
       this.oldValue = this.value;
     }
@@ -332,7 +217,7 @@ var ok = true;
 
 if(document.getElementById("ToF_Ref1").value == "") ok = false;
 if(document.getElementById("ToF_Ref2").value == "") ok = false;
-if(!ok) alert("Missing at least one ToF value!");
+if(!ok) alert("Missing at least on ToF value!");
 
 if(document.getElementById("ref1Laps").value == ""){
   alert("We need to know the lap number of reference 1, sorry.");
@@ -386,20 +271,9 @@ if(ok){
   var theLabel = document.getElementById("lblb");
   var DeltaToFErr = Math.sqrt(ToFRef2Err*ToFRef2Err*(mOverQ1/mOverQ2) + ToFRef1Err*ToFRef1Err)/DeltaN;
 
-/*
   bwithErr = {val: bvalue.toFixed(4), err: DeltaToFErr.toFixed(4)}
   document.getElementById("bEstimate").value = String(bvalue.toFixed(2));
   theLabel.innerHTML = String(bvalue.toFixed(2)).concat(" ± ", DeltaToFErr.toFixed(2));
-*/
-  bwithErr = {
-    val: bvalue,
-    err: DeltaToFErr
-  };
-
-  document.getElementById("bEstimate").value = bvalue.toFixed(2);
-  theLabel.innerHTML = `${bvalue.toFixed(2)} ± ${DeltaToFErr.toFixed(2)}`;
-
-  warnedAboutBMismatch = false;
 } 
 }
 //----------------------------------------------------    
@@ -442,19 +316,9 @@ function maket0Calc() {
 */
         var theLabel = document.getElementById("lblCalct0");
         var T0Err = Math.sqrt(ToFRef2Err*ToFRef2Err*(mOverQ1/mOverQ2) + ToFRef1Err*ToFRef1Err)/Math.abs(massRatio-1);
-/*
+
         t0withErr = {val: t0value.toFixed(2), err: T0Err.toFixed(2)};
         theLabel.innerHTML = String(t0value.toFixed(2)).concat(" ± ", T0Err.toFixed(2));
-*/
-        t0withErr = {
-          val: t0value,
-          err: T0Err
-        };
-
-        document.getElementById("t0").value = t0value.toFixed(2);
-        theLabel.innerHTML = `${t0value.toFixed(2)} ± ${T0Err.toFixed(2)}`;
-
-        warnedAboutT0Mismatch = false;
     } 
 }
 
@@ -473,6 +337,14 @@ document.getElementById("MassAna").innerHTML = String(theMass2).concat("", " u")
 var mOverQ1 = theMass1/theCharge1;
 var mOverQ2 = theMass2/theCharge2;
 
+if(t0withErr.err == 0){
+  if(document.getElementById("t0").value == ""){
+    alert("We will need a t_0 value to calculate things...");
+    ok = false;
+  }
+  else t0withErr.val = parseFloat(document.getElementById("t0").value);
+}
+
 var ref1Laps = parseFloat(document.getElementById("ref1Laps").value);
 var analyteLaps = parseFloat(document.getElementById("AnalyteLaps").value);
 var DeltaN = parseInt(ref1Laps) - parseInt(analyteLaps);
@@ -483,8 +355,6 @@ var ref1ToF = {val: tof1,
 if(isNaN(ref1ToF.err)) ref1ToF.err = 0;           
 
 var ok = true;
-var t0Calc = getT0ForCalculation();
-if(t0Calc == null) ok = false;
 if(isNaN(ref1Laps) || document.getElementById("ref1Laps").value == ""){
   alert("We need to know how many laps Reference 1 made!");
   ok = false;
@@ -501,13 +371,12 @@ if(theNuclide2 == ""){
 if(ok){
   if(document.getElementById("AnalyteLaps").value != ""){
     if(ref1Laps == analyteLaps){
-      var analyteToF = (ref1ToF.val - t0Calc.val)*Math.sqrt(mOverQ2/mOverQ1) + t0Calc.val;
+      var analyteToF = (ref1ToF.val - t0withErr.val)*Math.sqrt(mOverQ2/mOverQ1) + t0withErr.val;
       var analyteToFErr = (ref1ToF.err/ref1ToF.val)*analyteToF;
       document.getElementById("ToF_Analyte").value = String(analyteToF.toFixed(2));
       document.getElementById("ToF_AnalyteErr").value = analyteToFErr.toFixed(2);
     }
     else{
-/*
       if(bwithErr.err == 0){
         if(document.getElementById("bEstimate").value == ""){
           alert("We need a b-value for reference 1!");
@@ -515,11 +384,8 @@ if(ok){
         }
         else bwithErr.val = parseFloat(document.getElementById("bEstimate").value);
       }
-*/
-      var bCalc = getBForCalculation();
-      if(bCalc == null) ok = false;
-      var analyteToF = (ref1ToF.val - t0Calc.val)*Math.sqrt(mOverQ2/mOverQ1) + t0Calc.val;
-      var analyteB = {val: bCalc.val*Math.sqrt(mOverQ2/mOverQ1), err: bCalc.err*Math.sqrt(mOverQ2/mOverQ1)};
+      var analyteToF = (ref1ToF.val - t0withErr.val)*Math.sqrt(mOverQ2/mOverQ1) + t0withErr.val;
+      var analyteB = {val: bwithErr.val*Math.sqrt(mOverQ2/mOverQ1), err: bwithErr.err*Math.sqrt(mOverQ2/mOverQ1)};
       var DeltaN = parseInt(analyteLaps) - parseInt(ref1Laps);
       analyteToF += DeltaN*analyteB.val;
       var analyteToFErr = Math.sqrt( (ref1ToF.err/ref1ToF.val)*analyteToF*(ref1ToF.err/ref1ToF.val)*analyteToF + DeltaN*analyteB.err*DeltaN*analyteB.err);
@@ -528,14 +394,13 @@ if(ok){
     }
   }
   else if(document.getElementById("AnalyteEjTime").value == ""){//Assume same laps as ref1
-    var analyteToF = (ref1ToF.val - t0Calc.val)*Math.sqrt(mOverQ2/mOverQ1) + t0Calc.val;
+    var analyteToF = (ref1ToF.val - t0withErr.val)*Math.sqrt(mOverQ2/mOverQ1) + t0withErr.val;
     var analyteToFErr = (ref1ToF.err/ref1ToF.val)*analyteToF;
     document.getElementById("ToF_Analyte").value = String(analyteToF.toFixed(2));
     document.getElementById("ToF_AnalyteErr").value = analyteToFErr.toFixed(2);
     document.getElementById("AnalyteLaps").value = document.getElementById("ref1Laps").value;
   }
   else{ //We have the ejection time, so we can calculate the lap number with a b-value
-/*
     if(bwithErr.err == 0){
       if(document.getElementById("bEstimate").value == ""){
         alert("We need a b-value for reference 1!");
@@ -543,18 +408,15 @@ if(ok){
       }
       else bwithErr.val = parseFloat(document.getElementById("bEstimate").value);
     }
-*/
-    var bCalc = getBForCalculation();
-    if(bCalc == null) ok = false;
     if(ok){
       var tejAnalyte = parseFloat(document.getElementById("AnalyteEjTime").value);
-      var ref1tAtN0 = parseFloat(document.getElementById("ToF_Ref1").value) - ref1Laps*bCalc.val;
-      var AnalytetAtN0 = ref1tAtN0*Math.sqrt(mOverQ2/mOverQ1) - t0Calc.val;
-      analyteLaps = Math.ceil((tejAnalyte - AnalytetAtN0)/(bCalc.val*Math.sqrt(mOverQ2/mOverQ1)));
+      var ref1tAtN0 = parseFloat(document.getElementById("ToF_Ref1").value) - ref1Laps*bwithErr.val;
+      var AnalytetAtN0 = ref1tAtN0*Math.sqrt(mOverQ2/mOverQ1) - t0withErr.val;
+      analyteLaps = Math.ceil((tejAnalyte - AnalytetAtN0)/(bwithErr.val*Math.sqrt(mOverQ2/mOverQ1)));
       document.getElementById("AnalyteLaps").value = analyteLaps;
 
-      var analyteToF = (ref1ToF.val - t0Calc.val)*Math.sqrt(mOverQ2/mOverQ1) + t0Calc.val;
-      var analyteB = {val: bCalc.val*Math.sqrt(mOverQ2/mOverQ1), err: bCalc.err*Math.sqrt(mOverQ2/mOverQ1)};
+      var analyteToF = (ref1ToF.val - t0withErr.val)*Math.sqrt(mOverQ2/mOverQ1) + t0withErr.val;
+      var analyteB = {val: bwithErr.val*Math.sqrt(mOverQ2/mOverQ1), err: bwithErr.err*Math.sqrt(mOverQ2/mOverQ1)};
       var DeltaN = parseInt(analyteLaps) - parseInt(ref1Laps);
       analyteToF += DeltaN*analyteB.val;
       var analyteToFErr = Math.sqrt( (ref1ToF.err/ref1ToF.val)*analyteToF*(ref1ToF.err/ref1ToF.val)*analyteToF + DeltaN*analyteB.err*DeltaN*analyteB.err);
@@ -589,16 +451,15 @@ if(ok) if(isNaN(analyteToF.val) || document.getElementById("ToF_Analyte").value 
   alert("We need a ToF for the analyte!");
   ok = false;
 }
-if(ok) if(theNuclide1.value == ""){
+if(ok) if(theNuclide1 == ""){
   alert("We need a name for the reference ion!");
   ok = false;
 }
-if(ok) if(theNuclide2.value == ""){
+if(ok) if(theNuclide2 == ""){
   alert("We need a name for the analyte ion!");
   ok = false;
 }
 if(ok) if(ref1Laps !== AnalyteLaps){
-/*
   if(bwithErr.err == 0){
     if(document.getElementById("bEstimate").value == ""){
       alert("We need a b-value for reference 1!");
@@ -606,11 +467,7 @@ if(ok) if(ref1Laps !== AnalyteLaps){
     }
     else bwithErr.val = parseFloat(document.getElementById("bEstimate").value);
   }
-*/
-  var bCalc = getBForCalculation();
-  if(bCalc == null) ok = false;
 }
-/*
 if(ok) if(t0withErr.err == 0){
   if(document.getElementById("t0").value == ""){
     alert("We will need a t_0 value to calculate things...");
@@ -618,11 +475,9 @@ if(ok) if(t0withErr.err == 0){
   }
   else t0withErr.val = parseFloat(document.getElementById("t0").value);
 }
-*/
-var t0Calc = getT0ForCalculation();
-if(t0Calc == null) ok = false;
-if(ok) ok = checkFormula(theNuclide1.value);
-if(ok) ok = checkFormula(theNuclide2.value);
+alert("Here");
+if(ok) ok = checkFormula(theNuclide1);
+if(ok) ok = checkFormula(theNuclide2);
 if(ok) if(isNaN(AnalyteLaps) || document.getElementById("AnalyteLaps").value == ""){
   if(document.getElementById("AnalyteEjTime").value == ""){
     alert("We need to know how many laps the analyte made. Tell us that or the analyte's ejection time!");
@@ -640,9 +495,9 @@ if(ok) if(isNaN(AnalyteLaps) || document.getElementById("AnalyteLaps").value == 
     var mOverQ1 = theMass1/theCharge1;
     var mOverQ2 = theMass2/theCharge2;
     var tejAnalyte = parseFloat(document.getElementById("AnalyteEjTime").value);
-    var ref1tAtN0 = parseFloat(document.getElementById("ToF_Ref1").value) - ref1Laps*bCalc.val;
-    var AnalytetAtN0 = ref1tAtN0*Math.sqrt(mOverQ2/mOverQ1) - t0Calc.val;
-    AnalyteLaps = Math.ceil((tejAnalyte - AnalytetAtN0)/(bCalc.val*Math.sqrt(mOverQ2/mOverQ1)));
+    var ref1tAtN0 = parseFloat(document.getElementById("ToF_Ref1").value) - ref1Laps*bwithErr.val;
+    var AnalytetAtN0 = ref1tAtN0*Math.sqrt(mOverQ2/mOverQ1) - t0withErr.val;
+    AnalyteLaps = Math.ceil((tejAnalyte - AnalytetAtN0)/(bwithErr.val*Math.sqrt(mOverQ2/mOverQ1)));
     document.getElementById("AnalyteLaps").value = AnalyteLaps;
   }
 }
@@ -660,7 +515,7 @@ if(ok){
   var mOverQ2 = theMass2/theCharge2;
 
   if(ref1Laps == AnalyteLaps){
-    var rho = (analyteToF.val - t0Calc.val)/(ref1ToF.val - t0Calc.val);
+    var rho = (analyteToF.val - t0withErr.val)/(ref1ToF.val - t0withErr.val);
     var m = theCharge2*mOverQ1*rho*rho;
     var MassExcess = (m - Math.round(theMass2))*ukeV + theCharge2*eMasskeV;
     var dMassExcess = 2*m*Math.sqrt((analyteToF.err/analyteToF.val)*(analyteToF.err/analyteToF.val) + (ref1ToF.err/ref1ToF.val)*(ref1ToF.err/ref1ToF.val))*ukeV;
@@ -672,10 +527,10 @@ if(ok){
   }
   else{
     var DeltaN = AnalyteLaps - ref1Laps;
-    ref1ToF.val += DeltaN*bCalc.val;
-    ref1ToF.err += Math.abs(DeltaN)*bCalc.err;
+    ref1ToF.val += DeltaN*bwithErr.val;
+    ref1ToF.err += Math.abs(DeltaN)*bwithErr.err;
 //    console.log("AnalyteToF is ", analyteToF);
-    var rho = (analyteToF.val - t0Calc.val)/(ref1ToF.val - t0Calc.val);
+    var rho = (analyteToF.val - t0withErr.val)/(ref1ToF.val - t0withErr.val);
     var m = theCharge2*mOverQ1*rho*rho;
     var MassExcess = (m - Math.round(theMass2))*ukeV + theCharge2*eMasskeV;
     var dMassExcess = 2*m*Math.sqrt((analyteToF.err/analyteToF.val)*(analyteToF.err/analyteToF.val) + (ref1ToF.err/ref1ToF.val)*(ref1ToF.err/ref1ToF.val))*ukeV;
@@ -691,7 +546,7 @@ if(ok){
 //----------------------------------------------------  
 function checkFormula(thisNuclide, charge){
   var isValid = true;
-//  alert(thisNuclide);
+  alert(thisNuclide);
 
   var theNuclides = thisNuclide.split(/;|:/);
   var theAtoms = new Array();
@@ -711,17 +566,16 @@ function checkFormula(thisNuclide, charge){
 
   if(theAtoms.length == 0) isValid = false;
   if(isValid){
-    var theMass = 0;
     for(let i=0; i<theAtoms.length; i++){
 //      var theJSON = NUBASE.find(({nuclide}) => nuclide === theAtoms.at(i).nuclide);
       var theJSON = nubaseByNuclide.get(theAtoms.at(i).nuclide);
-      if (typeof theJSON === 'undefined') isValid = false;
+      if (typeof theJSON !== 'undefined') isValid = false;
       var n= parseFloat(theAtoms.at(i).theNumber);
       theMass += n*(theJSON.A*ukeV + theJSON.MassExcess);
     }
   }
 
-  // alert(thisNuclide);
+  alert(thisNuclide);
   if(isValid != true) alert("bad formula");
   return isValid;
 }
@@ -784,19 +638,10 @@ function getMarkup(thisNuclide, charge){
     var theMass = 0;
     var theMarkup ="";
     for(let i=0; i<theAtoms.length; i++){
+//      var theJSON = NUBASE.find(({nuclide}) => nuclide === theAtoms.at(i).nuclide);
       var theJSON = nubaseByNuclide.get(theAtoms.at(i).nuclide);
       var n= parseFloat(theAtoms.at(i).theNumber);
-//      var theAtom ="<sup>".concat(theJSON.A,"</sup>").concat("",theJSON.element);
-      let massLabel = String(theJSON.A);
-
-      if(theJSON.state && theJSON.state.trim() !== ""){
-        massLabel += theJSON.state.trim();
-      }
-
-      var theAtom =
-        "<sup>" + massLabel + "</sup>" +
-        theJSON.element;
-
+      var theAtom ="<sup>".concat(theJSON.A,"</sup>").concat("",theJSON.element);
       if(n>1) theAtom = theAtom.concat("<sub>", n).concat("", "</sub>");
       theMarkup = theMarkup.concat("", theAtom);// "<sup>".concat(theJSON.A,"</sup>").concat(theJSON.element,"<sub>").concat(n, "</sub>"));
     }
@@ -808,13 +653,8 @@ function getMarkup(thisNuclide, charge){
     return theMarkup;
   }
   
-//----------------------------------------------------
-function parseIsotopicAbundance(brText) {
-  const match = String(brText).match(/IS=([0-9.]+)/);
-  return match ? parseFloat(match[1]) : 0;
-}
-//----------------------------------------------------  
 
+//----------------------------------------------------  
 function finalParse(theJSON){
   //Get the element name correct with no spaces
   var firstLetterPosition;
@@ -861,12 +701,8 @@ function finalParse(theJSON){
     theJSON.nuclide = theJSON.element.concat("", theJSON.A);
     theJSON.A = parseInt(theJSON.A);
   }
+//    if(theJSON.element[0] == "C") console.log(theJSON.A, " ,", theJSON.nuclide);
 
-  theJSON.state = String(theJSON.state || "").trim();
-  if(["m", "n", "p", "q", "r", "x"].includes(theJSON.state)){
-    theJSON.nuclide = theJSON.nuclide.concat("", theJSON.state);
-  }
-  
   //Check for theory mark on mass excess
   for(let i=0; i<theJSON.MassExcess.length; i++){
     var thisChar = theJSON.MassExcess.at(i);
@@ -931,8 +767,7 @@ function finalParse(theJSON){
     theJSON.halflifeSeconds = 1e14;
     var endVal = 0;
     for(let i=0; i<theJSON.BR.length; i++) if(theJSON.BR.at(i) == ' ') endVal = i;
-//    theJSON.abundance = parseFloat(theJSON.BR.slice(3, endVal));
-    theJSON.abundance = parseIsotopicAbundance(theJSON.BR);
+    theJSON.abundance = parseFloat(theJSON.BR.slice(3, endVal));
   }
   else{
 //      console.log(theJSON.Halflife);
@@ -941,8 +776,7 @@ function finalParse(theJSON){
     if(theJSON.BR.slice(0,2) == "IS"){ 
       var endVal = 0;
       for(let i=0; i<theJSON.BR.length; i++) if(theJSON.BR.at(i) == ' ') endVal = i;
-//      theJSON.abundance = parseFloat(theJSON.BR.slice(3, endVal));
-      theJSON.abundance = parseIsotopicAbundance(theJSON.BR);
+      theJSON.abundance = parseFloat(theJSON.BR.slice(3, endVal));
     }
     else theJSON.abundance = 0;
   }
@@ -1343,62 +1177,6 @@ function addSCMResultRow(tblBody, result, charge){
   tblBody.appendChild(row);
 }
 
-//----------------------------------------------------
-function makeSCMTableCSV() {
-  const tbl = document.getElementById("SCMTable");
-  if(!tbl) return "";
-
-  const lines = [];
-  const crlf = "\r\n";
-
-  const headerCells = Array.from(tbl.querySelectorAll("thead th"));
-  const headers = headerCells.map(th => csvEscape(th.textContent.trim()));
-  lines.push(headers.join(","));
-
-  const rows = Array.from(tbl.querySelectorAll("tbody tr"));
-
-  for(const row of rows){
-    const cells = Array.from(row.querySelectorAll("td"));
-
-    const values = cells.map((cell, index) => {
-      if(index === 0 && cell.dataset.copyText){
-        return csvEscape(cell.dataset.copyText);
-      }
-      return csvEscape(cell.textContent.trim());
-    });
-
-    lines.push(values.join(","));
-  }
-
-  return lines.join(crlf) + crlf;
-}
-
-function csvEscape(value) {
-  value = String(value ?? "");
-
-  if(value.includes('"') || value.includes(",") || value.includes("\r") || value.includes("\n")){
-    value = '"' + value.replace(/"/g, '""') + '"';
-  }
-
-  return value;
-}
-
-function downloadTextFile(filename, text) {
-  const blob = new Blob([text], { type: "text/csv;charset=utf-8" });
-  const url = URL.createObjectURL(blob);
-
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = filename;
-  document.body.appendChild(a);
-  a.click();
-
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
-}
-
-//----------------------------------------------------
-
 function stopActiveSCMSearch(){
   if(activeSCMSearch && activeSCMSearch.workers){
     for(const worker of activeSCMSearch.workers){
@@ -1566,34 +1344,13 @@ async function reallyFindSCM(){
   const lastLap = Math.round(laps_SCM + SCMLapsRange);
   const lapJobs = [];
 
-  var t0Calc = getT0ForCalculation();
-  if(t0Calc == null){
-    document.getElementById("btnFindSCM").innerHTML = "Find Them!";
-    updateSCMProgress(0, 1, "Need t_0");
-    activeSCMSearch = null;
-    return;
-  }
-
-  const needsB = (firstLap != m_lap) || (lastLap != m_lap);
-  let bCalc = null;
-  if(needsB){
-    bCalc = getBForCalculation();
-
-    if(bCalc == null){
-      document.getElementById("btnFindSCM").innerHTML = "Find Them!";
-      updateSCMProgress(0, 1, "Need b-value");
-      activeSCMSearch = null;
-      return;
-    }
-  }
-
   for(let lapsThis = firstLap; lapsThis <= lastLap; lapsThis++){
     const lapDiff = lapsThis - m_lap;
     let t_ref_this = t_ref;
     let dt_ref_this = dt_ref;
 
     if(lapDiff != 0){
-      if(bCalc.val == 0 || isNaN(bCalc.val)){
+      if(bwithErr.val == 0 || isNaN(bwithErr.val)){
         alert("Need to evaluate b-value to do this!");
         document.getElementById("btnFindSCM").innerHTML = "Find Them!";
         updateSCMProgress(0, 1, "Need b-value");
@@ -1601,10 +1358,10 @@ async function reallyFindSCM(){
         return;
       }
 
-      t_ref_this = t_ref + lapDiff * bCalc.val;
+      t_ref_this = t_ref + lapDiff * bwithErr.val;
       dt_ref_this = Math.sqrt(
         dt_ref * dt_ref +
-        Math.pow(Math.abs(lapDiff) * bCalc.err, 2)
+        Math.pow(Math.abs(lapDiff) * bwithErr.err, 2)
       );
 
       if(isNaN(dt_ref_this)){
@@ -1616,17 +1373,13 @@ async function reallyFindSCM(){
     var m_SCM =
       (q_SCM / q_ref) *
       m_ref *
-      Math.pow(t_SCM - t0Calc.val, 2) /
-      Math.pow(t_ref_this - t0Calc.val, 2);
+      Math.pow(t_SCM - t0withErr.val, 2) /
+      Math.pow(t_ref_this - t0withErr.val, 2);
 
     var dm_SCM =
       Math.sqrt(
-/*
         (dt_ref_this * dt_ref_this) / (t_ref_this * t_ref_this) +
         (dt_SCM * dt_SCM) / (t_SCM * t_SCM)
-*/
-        (dt_ref_this * dt_ref_this) / Math.pow(t_ref_this - t0Calc.val, 2) +
-        (dt_SCM * dt_SCM) / Math.pow(t_SCM - t0Calc.val, 2)
       ) * m_SCM;
 
     var massToleranceU = maxSigma * dm_SCM;
@@ -1743,124 +1496,3 @@ async function reallyFindSCM(){
 
 //----------------------------------------------------  
 
-function getT0ForCalculation() {
-  const t0Input = document.getElementById("t0");
-  const t0 = parseFloat(t0Input.value);
-
-  if (!Number.isFinite(t0)) {
-    alert("We will need a t_0 value to calculate things...");
-    return null;
-  }
-
-  let dt0 = DEFAULT_T0_ERR_NS;
-
-  const calcT0 = parseFloat(t0withErr.val);
-  const calcDt0 = parseFloat(t0withErr.err);
-
-  const hasCalculatedT0 =
-    Number.isFinite(calcT0) &&
-    Number.isFinite(calcDt0) &&
-    calcDt0 > 0;
-
-  if (hasCalculatedT0) {
-    const matchesCalculatedT0 = Math.abs(t0 - calcT0) < 0.005; // ns tolerance
-
-    if (matchesCalculatedT0) {
-      dt0 = calcDt0;
-      warnedAboutT0Mismatch = false;
-    } else if (!warnedAboutT0Mismatch) {
-      alert(
-        "The Estimated t_0 value has been edited after calculating t_0. " +
-        "Using the entered t_0 value, but assuming dt_0 = 10 ns."
-      );
-      warnedAboutT0Mismatch = true;
-    }
-  }
-
-return { val: t0, err: dt0 };
-}
-
-//----------------------------------------------------  
-
-function getBForCalculation() {
-  const bInput = document.getElementById("bEstimate");
-  const b = parseFloat(bInput.value);
-
-  if (!Number.isFinite(b)) {
-    alert("We need a b-value for reference 1!");
-    return null;
-  }
-
-  let db = DEFAULT_B_ERR_NS;
-
-  const calcB = parseFloat(bwithErr.val);
-  const calcDb = parseFloat(bwithErr.err);
-
-  const hasCalculatedB =
-    Number.isFinite(calcB) &&
-    Number.isFinite(calcDb) &&
-    calcDb > 0;
-
-  if (hasCalculatedB) {
-    const matchesCalculatedB = Math.abs(b - calcB) < 0.005; // ns tolerance
-
-    if (matchesCalculatedB) {
-      db = calcDb;
-      warnedAboutBMismatch = false;
-    } else if (!warnedAboutBMismatch) {
-      alert(
-        "The estimated b-value has been edited after calculating b. " +
-        "Using the entered b-value, but assuming db = 1 ns."
-      );
-      warnedAboutBMismatch = true;
-    }
-  }
-
-  return { val: b, err: db };
-}
-
-//----------------------------------------------------
-
-function saveLastRefSettings() {
-  const settings = {
-    NameRef1: document.getElementById("NameRef1").value,
-    ToF_Ref1: document.getElementById("ToF_Ref1").value,
-    ToF_Ref1err: document.getElementById("ToF_Ref1err").value,
-    ref1Laps: document.getElementById("ref1Laps").value,
-
-    NameRef2: document.getElementById("NameRef2").value,
-    ToF_Ref2: document.getElementById("ToF_Ref2").value,
-    ToF_Ref2err: document.getElementById("ToF_Ref2err").value,
-    ref2Laps: document.getElementById("ref2Laps").value,
-
-    bEstimate: document.getElementById("bEstimate").value,
-    t0: document.getElementById("t0").value
-  };
-
-  localStorage.setItem(LAST_REF_SETTINGS_KEY, JSON.stringify(settings));
-}
-
-function loadLastRefSettings() {
-  const raw = localStorage.getItem(LAST_REF_SETTINGS_KEY);
-  if(!raw) return;
-
-  let settings;
-  try {
-    settings = JSON.parse(raw);
-  } catch(e) {
-    localStorage.removeItem(LAST_REF_SETTINGS_KEY);
-    return;
-  }
-
-  for(const id in settings){
-    const el = document.getElementById(id);
-    if(el && settings[id] !== undefined && settings[id] !== null && settings[id] !== ""){
-      el.value = settings[id];
-    }
-  }
-}
-
-//----------------------------------------------------
-function runningInElectron() {
-  return !!window.electronAPI || navigator.userAgent.includes("Electron");
-}
