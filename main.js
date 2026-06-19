@@ -3,8 +3,14 @@
 // Modules to control application life and create native browser window
 const { app, BrowserWindow, Menu, MenuItem, ipcMain } = require('electron')
 
-if (require('electron-squirrel-startup')) {
-  app.quit();
+if (process.platform === 'win32') {
+  try {
+    if (require('electron-squirrel-startup')) {
+      app.quit();
+    }
+  } catch {
+    // electron-squirrel-startup is optional outside Windows builds
+  }
 }
 
 const isMac = process.platform === 'darwin'
