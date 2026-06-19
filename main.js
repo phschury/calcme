@@ -19,10 +19,12 @@ const path = require('node:path')
 const createWindow = () => {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
-    width: 735,
-    height: 730,
+    width: process.platform === 'win32' ? 760 : 735,
+    height: process.platform === 'win32' ? 760 : 730,
+    useContentSize: true,
     resizable: false,
-//    icon: path.join(__dirname, 'assets/icon.png'),
+    fullscreenable: false,
+    autoHideMenuBar: false,
     icon: path.join(
       __dirname,
       process.platform === 'win32' ? 'assets/icon.ico' : 'assets/icon.png'
