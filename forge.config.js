@@ -17,7 +17,6 @@ const keep = new Set([
   'assets',
   'images',
 
-  // root-level image assets
   'Mirror.png',
   'wnsc_logo.png',
   'icon.jpeg',
@@ -25,7 +24,6 @@ const keep = new Set([
   'icon.ico',
   'icon.icns',
 
-  // needed for Windows Squirrel startup handling
   'node_modules',
 ]);
 
@@ -68,11 +66,15 @@ module.exports = {
   rebuildConfig: {},
 
   makers: [
-    { name: '@electron-forge/maker-squirrel', config: {} },
-    { name: '@electron-forge/maker-zip', platforms: ['darwin'] },
-    { name: '@electron-forge/maker-dmg', config: {} },
-    { name: '@electron-forge/maker-deb', config: {} },
-    { name: '@electron-forge/maker-rpm', config: {} },
+    {
+      name: '@electron-forge/maker-squirrel',
+      platforms: ['win32'],
+      config: {},
+    },
+    {
+      name: '@electron-forge/maker-zip',
+      platforms: ['darwin'],
+    },
   ],
 
   plugins: [
