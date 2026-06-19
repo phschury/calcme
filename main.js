@@ -19,8 +19,8 @@ const path = require('node:path')
 const createWindow = () => {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
-    width: process.platform === 'win32' ? 760 : 735,
-    height: process.platform === 'win32' ? 760 : 730,
+    width: process.platform === 'win32' ? 750 : 735,
+    height: process.platform === 'win32' ? 745 : 730,
     useContentSize: true,
     resizable: false,
     fullscreenable: false,
