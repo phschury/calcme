@@ -15,7 +15,8 @@ If the lap number is not known for reference #2 or for the analyte, it can be de
 by supplying the ejection time from the MRTOF if values for b and t0 are provided or have 
 been calculated already.
 
-The provided files are for building Electron app.  For testing:
+The provided files are for building Electron app.  Please use Node v22 for now, as later versions have been seen to have conflicts with the current release of Electron Forge.
+For testing:
 
     git clone https://github.com/phschury/calcme.git
     
@@ -33,3 +34,4 @@ To build:
 
 
 A Javascript version for use with web server is available in /ufo_finder_web_static
+It can be also be found running at https://research.kek.jp/group/wnsc/CalcMRTOF/
