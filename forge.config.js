@@ -52,18 +52,53 @@ function cleanCopiedApp(buildPath) {
   }
 }
 
+const makers = [];
+
+if (process.platform === 'win32') {
+  makers.push({
+    name: '@electron-forge/maker-squirrel',
+    platforms: ['win32'],
+    config: {},
+  });
+}
+
+if (process.platform === 'darwin') {
+  makers.push(
+    {
+      name: '@electron-forge/maker-dmg',
+      platforms: ['darwin'],
+      config: {
+        name: 'calcme',
+        icon: './assets/icon.icns',
+        overwrite: true,
+      },
+    },
+    {
+      name: '@electron-forge/maker-zip',
+      platforms: ['darwin'],
+    }
+  );
+}
+
+if (process.platform === 'linux') {
+  makers.push({
+    name: '@electron-forge/maker-zip',
+    platforms: ['linux'],
+  });
+}
+
 module.exports = {
   packagerConfig: {
     osxSign: process.env.CSC_NAME
       ? {
-          identity: process.env.CSC_NAME
+          identity: process.env.CSC_NAME,
         }
       : undefined,
 
     osxNotarize: process.env.NOTARY_KEYCHAIN_PROFILE
       ? {
-          tool: "notarytool",
-          keychainProfile: process.env.NOTARY_KEYCHAIN_PROFILE
+          tool: 'notarytool',
+          keychainProfile: process.env.NOTARY_KEYCHAIN_PROFILE,
         }
       : undefined,
 
@@ -79,87 +114,9 @@ module.exports = {
   },
 
   rebuildConfig: {},
-/*
-  makers: [
-    {
-      name: '@electron-forge/maker-squirrel',
-      platforms: ['win32'],
-      config: {},
-    },
-    {
-      name: '@electron-forge/maker-dmg',
-      platforms: ['darwin'],
-      config: {
-        name: 'calcme',
-        icon: './assets/icon.icns',
-        overwrite: true
-      },
-    },
-    {
-      name: '@electron-forge/maker-zip',
-      platforms: ['darwin'],
-    },
-  ],
-*/
-  makers: [
-    {
-      name: '@electron-forge/maker-squirrel',
-      platforms: ['win32'],
-      config: {},
-    },
 
-    {
-      name: '@electron-forge/maker-dmg',
-      platforms: ['darwin'],
-      config: {
-        name: 'calcme',
-        icon: './assets/icon.icns',
-        overwrite: true
-      },
-    },
-    {
-      name: '@electron-forge/maker-zip',
-      platforms: ['darwin'],
-    },
+  makers,
 
-    {
-      name: '@electron-forge/maker-deb',
-      platforms: ['linux'],
-      config: {
-        options: {
-          name: 'calcme',
-          productName: 'UFO Finder',
-          genericName: 'MRTOF mass calculator',
-          maintainer: 'P. Schury',
-          homepage: 'https://github.com/phschury/calcme',
-          icon: './assets/icon.png',
-          categories: ['Science', 'Education'],
-        },
-      },
-    },
-
-    {
-      name: '@electron-forge/maker-rpm',
-      platforms: ['linux'],
-      config: {
-        options: {
-          name: 'calcme',
-          productName: 'UFO Finder',
-          genericName: 'MRTOF mass calculator',
-          maintainer: 'P. Schury',
-          homepage: 'https://github.com/phschury/calcme',
-          icon: './assets/icon.png',
-          categories: ['Science', 'Education'],
-        },
-      },
-    },
-
-    {
-      name: '@electron-forge/maker-zip',
-      platforms: ['linux'],
-    },
-  ],
-  
   plugins: [
     {
       name: '@electron-forge/plugin-auto-unpack-natives',
