@@ -79,7 +79,7 @@ module.exports = {
   },
 
   rebuildConfig: {},
-
+/*
   makers: [
     {
       name: '@electron-forge/maker-squirrel',
@@ -100,7 +100,66 @@ module.exports = {
       platforms: ['darwin'],
     },
   ],
+*/
+  makers: [
+    {
+      name: '@electron-forge/maker-squirrel',
+      platforms: ['win32'],
+      config: {},
+    },
 
+    {
+      name: '@electron-forge/maker-dmg',
+      platforms: ['darwin'],
+      config: {
+        name: 'calcme',
+        icon: './assets/icon.icns',
+        overwrite: true
+      },
+    },
+    {
+      name: '@electron-forge/maker-zip',
+      platforms: ['darwin'],
+    },
+
+    {
+      name: '@electron-forge/maker-deb',
+      platforms: ['linux'],
+      config: {
+        options: {
+          name: 'calcme',
+          productName: 'UFO Finder',
+          genericName: 'MRTOF mass calculator',
+          maintainer: 'P. Schury',
+          homepage: 'https://github.com/phschury/calcme',
+          icon: './assets/icon.png',
+          categories: ['Science', 'Education'],
+        },
+      },
+    },
+
+    {
+      name: '@electron-forge/maker-rpm',
+      platforms: ['linux'],
+      config: {
+        options: {
+          name: 'calcme',
+          productName: 'UFO Finder',
+          genericName: 'MRTOF mass calculator',
+          maintainer: 'P. Schury',
+          homepage: 'https://github.com/phschury/calcme',
+          icon: './assets/icon.png',
+          categories: ['Science', 'Education'],
+        },
+      },
+    },
+
+    {
+      name: '@electron-forge/maker-zip',
+      platforms: ['linux'],
+    },
+  ],
+  
   plugins: [
     {
       name: '@electron-forge/plugin-auto-unpack-natives',
