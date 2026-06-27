@@ -1104,8 +1104,7 @@ function getChart(mydiv){
               var thisData = new Array();
               thisData = theWholeTable.at(i).split(' ');
               var thisJSON = {Symbol: "", row: "", column: "", selected: "N"};
-              if(thisData.length = 3){
-
+              if(thisData.length == 3){
                 thisJSON.Symbol = thisData.at(0);
                 thisJSON.row = parseFloat(thisData.at(1));
                 thisJSON.column = parseFloat(thisData.at(2));
@@ -1133,6 +1132,35 @@ function getChart(mydiv){
       btnThisElement.style.top = 1.5+15*symbols.at(i).row + "px";
       btnThisElement.style.width = '27px';
       btnThisElement.style.font = "10px Arial";
+      btnThisElement.addEventListener("click",
+        function(event){
+          const idx = parseInt(this.index);
+          const current = symbols.at(idx).selected;
+
+          if(event.shiftKey){
+            // Shift-click cycles R <-> N
+            if(current === "R"){
+              this.style.backgroundColor = "yellow";
+              symbols.at(idx).selected = "N";
+            }
+            else{
+              this.style.backgroundColor = "pink";
+              symbols.at(idx).selected = "R";
+            }
+          }
+          else{
+            // Normal click cycles Y <-> N
+            if(current === "Y"){
+              this.style.backgroundColor = "yellow";
+              symbols.at(idx).selected = "N";
+            }
+            else{
+              this.style.backgroundColor = "green";
+              symbols.at(idx).selected = "Y";
+            }
+          }
+        }, false);
+/*
       btnThisElement.addEventListener("click", 
         function(){
           if(this.style.backgroundColor === "green"){ 
@@ -1144,6 +1172,7 @@ function getChart(mydiv){
              symbols.at(parseInt(this.index)).selected = "Y";
           }
         }, false);
+*/
         btnThisElement.innerHTML = symbols.at(i).Symbol;
       mydiv.appendChild(btnThisElement);
     }
@@ -1192,9 +1221,13 @@ function fnStandardSelection(){
 function getListOfSelectedElements(){
   var selectedElements = new Array();
   for(let i=0; i<periodicData.length;i++){
-    if(periodicData.at(i).selected === "Y"){ 
+    if(periodicData.at(i).selected === "Y" || periodicData.at(i).selected === "R"){ 
 //      console.log(periodicData.at(i).Symbol);
-      selectedElements.push(periodicData.at(i).Symbol);
+//      selectedElements.push(periodicData.at(i).Symbol);
+        selectedElements.push({
+          Symbol: periodicData.at(i).Symbol,
+          selected: periodicData.at(i).selected
+        });
     }
   }
 
@@ -1214,7 +1247,9 @@ function getListOfSelectedIsotopes(){
   console.log(minHalflife);
 */
   for(let i=0; i<theSelectedElements.length; i++){
-    var thisElement = theSelectedElements.at(i);
+//    var thisElement = theSelectedElements.at(i);
+    var thisElement = theSelectedElements.at(i).Symbol;
+    var thisSelectionMode = theSelectedElements.at(i).selected; // "Y" or "R"
 //    console.log(thisElement);
     for(let j=0; j<NUBASE.length; j++){
       if(thisElement == NUBASE.at(j).element){ 
@@ -1222,7 +1257,7 @@ function getListOfSelectedIsotopes(){
 //          console.log(NUBASE.at(j).nuclide);
           theSelectedIsotopes.push(NUBASE.at(j).nuclide);
         }
-        if(maxRIs > 0) if(parseFloat(NUBASE.at(j).abundance) == 0){
+        if(maxRIs > 0) if(parseFloat(NUBASE.at(j).abundance) == 0 && thisSelectionMode === "R"){
           if(NUBASE.at(j).halflifeSeconds > minHalflife){
 //            console.log("%s, %d s", NUBASE.at(j).nuclide, NUBASE.at(j).halflifeSeconds);
             theSelectedIsotopes.push(NUBASE.at(j).nuclide);

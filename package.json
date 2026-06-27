@@ -1,6 +1,6 @@
 {
   "name": "calcme",
-  "version": "1.0.0",
+  "version": "2.2",
   "description": "MRTOF Calculator",
   "main": "main.js",
   "scripts": {
@@ -13,12 +13,13 @@
   "license": "MIT",
   "devDependencies": {
     "@electron-forge/cli": "^7.6.1",
+    "@electron-forge/maker-dmg": "^7.6.1",
     "@electron-forge/maker-squirrel": "^7.6.1",
     "@electron-forge/maker-zip": "^7.6.1",
     "@electron-forge/plugin-auto-unpack-natives": "^7.6.1",
     "@electron-forge/plugin-fuses": "^7.6.1",
     "@electron/fuses": "^1.8.0",
-    "electron": "^31.0.1"
+    "electron": "^31.7.7"
   },
   "dependencies": {
     "electron-squirrel-startup": "^1.0.1"

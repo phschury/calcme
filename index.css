@@ -1,9 +1,40 @@
+/*
+:root {
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 12px;
+}
+
+body, input, button, select, table, th, td, text, a {
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif !important;
+    font-size: 11.5px !important;
+}
+
+:root {
+    font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
+    font-size: 12px;
+}
+
+body, input, button, select, table, th, td, text, a {
+    font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif !important;
+    font-size: 12px !important;
+}
+
+
+button {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: clip;
+    line-height: 1;
+    font-size: 12px !important;
+}
+*/
+
 #userManualLink {
     position: absolute;
     top: 8px;
     right: 15px;
     z-index: 100;
-    font-family: Arial, Helvetica, sans-serif;
+/*    font-family: Arial, Helvetica, sans-serif; */
     font-size: 14px;
     font-weight: bold;
     text-decoration: none;

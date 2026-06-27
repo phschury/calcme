@@ -3,6 +3,16 @@
 // Modules to control application life and create native browser window
 const { app, BrowserWindow, Menu, MenuItem, ipcMain } = require('electron')
 
+console.log(app.commandLine.getSwitchValue("use-angle"));
+
+app.commandLine.appendSwitch('ignore-gpu-blocklist');
+app.commandLine.appendSwitch('use-angle', 'metal');
+app.commandLine.appendSwitch('enable-gpu-rasterization');
+
+app.whenReady().then(() => {
+    console.log(app.getGPUFeatureStatus());
+});
+
 if (process.platform === 'win32') {
   try {
     if (require('electron-squirrel-startup')) {
