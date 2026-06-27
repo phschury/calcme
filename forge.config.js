@@ -16,6 +16,7 @@ const keep = new Set([
   'periodic.data',
   'assets',
   'images',
+  'fonts',
 
   'Mirror.png',
   'wnsc_logo.png',
@@ -29,6 +30,7 @@ const keep = new Set([
 
 const keepNodeModules = new Set([
   'electron-squirrel-startup',
+  '@fontsource',
 ]);
 
 function cleanCopiedApp(buildPath) {
@@ -52,6 +54,19 @@ function cleanCopiedApp(buildPath) {
 
 module.exports = {
   packagerConfig: {
+    osxSign: process.env.CSC_NAME
+      ? {
+          identity: process.env.CSC_NAME
+        }
+      : undefined,
+
+    osxNotarize: process.env.NOTARY_KEYCHAIN_PROFILE
+      ? {
+          tool: "notarytool",
+          keychainProfile: process.env.NOTARY_KEYCHAIN_PROFILE
+        }
+      : undefined,
+
     asar: true,
     icon: './assets/icon',
 
@@ -70,6 +85,15 @@ module.exports = {
       name: '@electron-forge/maker-squirrel',
       platforms: ['win32'],
       config: {},
+    },
+    {
+      name: '@electron-forge/maker-dmg',
+      platforms: ['darwin'],
+      config: {
+        name: 'calcme',
+        icon: './assets/icon.icns',
+        overwrite: true
+      },
     },
     {
       name: '@electron-forge/maker-zip',
